@@ -1,0 +1,9 @@
+eula.txt
+logs/
+crash-reports/
+world/
+banned-players.json
+banned-ips.json
+whitelist.json
+usernamecache.json
+usercache.json
