@@ -3347,7 +3347,12 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
     event.create("dimensionally_transcendent_dirt_forge", "multiblock")
         .rotationState(RotationState.ALL)
         .recipeType("primitive_blast_furnace")
-        .recipeModifier((machine, recipe) => GTRecipeModifiers.accurateParallel(machine, recipe, 524288, false).getFirst())
+        .recipeModifier((machine, recipe) => {
+            let recipe1 = recipe.copy()
+            recipe1.duration = 0
+            recipe1 = GTRecipeModifiers.fastParallel(machine, recipe1, 524288, false).getFirst()
+            return recipe1
+        })
         .appearanceBlock(GTBlocks.CASING_PRIMITIVE_BRICKS)
         .pattern(definition =>
             dtpf().where("a", Predicates.controller(Predicates.blocks(definition.get())))
@@ -3360,13 +3365,6 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .where("s", Predicates.blocks("gtceu:firebricks"))
                 .where(" ", Predicates.any())
                 .build())
-        .onWorking(machine => {
-            let logic = machine.getRecipeLogic()
-            if (logic.getProgress() == 1) {
-                logic.setProgress(logic.getDuration() - 1)
-            }
-            return true
-        })
         .additionalDisplay((controller, components) => {
             if (controller.isFormed()) {
                 components.add(Component.translatable("gtceu.multiblock.parallel", Component.literal("524288").darkPurple()).gray())
@@ -3377,7 +3375,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
     event.create("dimensionally_transcendent_steam_oven", "multiblock", (holder) => new $SteamParallelMultiblockMachine(holder, 524288))
         .rotationState(RotationState.ALL)
         .recipeType(GTRecipeTypes.FURNACE_RECIPES)
-        .recipeModifier((machine, recipe) => $SteamParallelMultiblockMachine.recipeModifier(machine, recipe, 0), true)
+        .recipeModifiers([(machine, recipe) => GTRecipeModifiers.reduction(recipe, 0.01, 1), (machine, recipe) => $SteamParallelMultiblockMachine.recipeModifier(machine, recipe, 0)])
         .appearanceBlock(GTBlocks.CASING_COKE_BRICKS)
         .pattern(definition =>
             dtpf().where("a", Predicates.controller(Predicates.blocks(definition.get())))
@@ -4254,23 +4252,4 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             }
         })
         .workableCasingRenderer("kubejs:block/molecular_casing", "gtceu:block/multiblock/fusion_reactor")
-
-    event.create("circuit_printer", "multiblock")
-        .rotationState(RotationState.ALL)
-        .recipeType("circuit_printer")
-        .recipeModifiers([(machine, recipe) => GTRecipeModifiers.accurateParallel(machine, recipe, 2147483647, false).getFirst(), GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
-        .appearanceBlock(GTBlocks.CASING_STEEL_SOLID)
-        .pattern((definition) =>
-            FactoryBlockPattern.start()
-                .aisle("bbb", "bbb", "bbb")
-                .aisle("bbb", "b b", "bbb")
-                .aisle("bbb", "bab", "bbb")
-                .where("a", Predicates.controller(Predicates.blocks(definition.get())))
-                .where("b", Predicates.blocks(GTBlocks.CASING_STEEL_SOLID.get())
-                    .setMinGlobalLimited(10)
-                    .or(Predicates.autoAbilities(definition.getRecipeTypes()))
-                    .or(Predicates.abilities(PartAbility.MAINTENANCE).setExactLimit(1)))
-                .where(" ", Predicates.air())
-                .build())
-        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_solid_steel", "gtceu:block/multiblock/gcym/large_cutter")
 })
