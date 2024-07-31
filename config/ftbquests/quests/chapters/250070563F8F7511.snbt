@@ -554,7 +554,7 @@
 		}
 		{
 			dependencies: ["52A0EE026A3D3A79"]
-			description: ["潜行右键可以自动搭建多方块结构"]
+			description: ["手持终端潜行右键可以自动搭建多方块结构，如果是空手则会显示预览"]
 			id: "4AB25C15F0B05AA0"
 			optional: true
 			rewards: [{
@@ -990,65 +990,6 @@
 			}]
 			x: 3.5d
 			y: 2.0d
-		}
-		{
-			dependencies: ["050FD340224F7AB6"]
-			description: ["GTM现在加入了危险物品设定，你接触有毒物品时间过长就会中毒。"]
-			icon: "gtceu:radioactive_hazard_sign_block"
-			id: "4FF1DD54D99286CE"
-			rewards: [
-				{
-					id: "48DB8D7B13A312FA"
-					item: {
-						Count: 1
-						id: "gtceu:hazmat_headpiece"
-						tag: {
-							Damage: 0
-						}
-					}
-					type: "item"
-				}
-				{
-					id: "62EBB6CA300DB3D5"
-					item: {
-						Count: 1
-						id: "gtceu:hazmat_chestpiece"
-						tag: {
-							Damage: 0
-						}
-					}
-					type: "item"
-				}
-				{
-					id: "03E226CFB70773C3"
-					item: {
-						Count: 1
-						id: "gtceu:hazmat_leggings"
-						tag: {
-							Damage: 0
-						}
-					}
-					type: "item"
-				}
-				{
-					id: "67228FCC27C4D5D3"
-					item: {
-						Count: 1
-						id: "gtceu:hazmat_boots"
-						tag: {
-							Damage: 0
-						}
-					}
-					type: "item"
-				}
-			]
-			tasks: [{
-				id: "5032361CEA7C0A10"
-				title: "我为什么会中毒"
-				type: "checkmark"
-			}]
-			x: -0.5d
-			y: -1.0d
 		}
 		{
 			dependencies: ["2DC6C5D7DDA578F7"]
