@@ -9,17 +9,14 @@ const $ComputationProviderMachine = Java.loadClass("com.gregtechceu.gtceu.common
 const $Slaughterhouse = Java.loadClass("com.gregtechceu.gtceu.common.machine.multiblock.electric.Slaughterhouse")
 const $DysonSphere = Java.loadClass("com.gregtechceu.gtceu.common.machine.multiblock.generator.DysonSphere")
 const $StorageMachine = Java.loadClass("com.gregtechceu.gtceu.common.machine.multiblock.electric.StorageMachine")
+const $AssemblyLineMachine = Java.loadClass("com.gregtechceu.gtceu.common.machine.multiblock.electric.AssemblyLineMachine")
 const $ItemRecipeCapability = Java.loadClass("com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability")
 const $RecipeHelper = Java.loadClass("com.gregtechceu.gtceu.api.recipe.RecipeHelper")
 const $TeamUtil = Java.loadClass("com.hepdd.gtmthings.utils.TeamUtil")
 const $FormattingUtil = Java.loadClass("com.gregtechceu.gtceu.utils.FormattingUtil")
 const $WirelessEnergyManager = Java.loadClass("com.hepdd.gtmthings.api.misc.WirelessEnergyManager")
 const $BigInteger = Java.loadClass("java.math.BigInteger")
-const gtch = Java.loadClass("com.gregtechceu.gtceu.api.capability.GTCapabilityHelper")
-const mcbr = Java.loadClass("net.minecraft.core.registries.BuiltInRegistries")
-const mcrl = Java.loadClass("net.minecraft.resources.ResourceLocation")
-const ContentBuilder = Java.loadClass("com.gregtechceu.gtceu.data.ContentBuilder")
-const create_hpca_content = ContentBuilder().eu(GTValues.V[GTValues.MAX]).build()
+const $GTCapabilityHelper = Java.loadClass("com.gregtechceu.gtceu.api.capability.GTCapabilityHelper")
 const tiers = [["ulv", 0], ["lv", 1], ["mv", 2], ["hv", 3], ["ev", 4], ["iv", 5], ["luv", 6], ["zpm", 7], ["uv", 8], ["uhv", 9], ["uev", 10], ["uiv", 11], ["uxv", 12], ["opv", 13], ["max", 14]]
 const cov_recipe = { "minecraft:bone_block": "kubejs:essence_block", "minecraft:oak_log": "minecraft:crimson_stem", "minecraft:birch_log": "minecraft:warped_stem", "gtceu:calcium_block": "minecraft:bone_block", "minecraft:moss_block": "minecraft:sculk", "minecraft:grass_block": "minecraft:moss_block", "kubejs:infused_obsidian": "kubejs:draconium_block_charged" }
 const mobList1 = ["chicken", "rabbit", "sheep", "cow", "horse", "pig", "donkey", "skeleton_horse", "villager", "iron_golem", "wolf", "goat", "parrot", "camel", "cat", "fox", "llama", "panda", "polar_bear"]
@@ -52,7 +49,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         let pos = machine.self().getPos()
         let coordinates = [pos.offset(1, 2, 0), pos.offset(1, 2, 1), pos.offset(1, 2, -1), pos.offset(0, 2, 1), pos.offset(0, 2, -1), pos.offset(-1, 2, 0), pos.offset(-1, 2, 1), pos.offset(-1, 2, -1), pos.offset(2, 2, 0), pos.offset(2, 2, -1), pos.offset(2, 2, 1), pos.offset(3, 2, 0), pos.offset(3, 2, -1), pos.offset(3, 2, 1), pos.offset(-2, 2, 0), pos.offset(-2, 2, -1), pos.offset(-2, 2, 1), pos.offset(-3, 2, 0), pos.offset(-3, 2, -1), pos.offset(-3, 2, 1), pos.offset(-1, 2, 2), pos.offset(0, 2, 2), pos.offset(1, 2, 2), pos.offset(-1, 2, 3), pos.offset(0, 2, 3), pos.offset(1, 2, 3), pos.offset(-1, 2, -2), pos.offset(0, 2, -2), pos.offset(1, 2, -2), pos.offset(-1, 2, - 3), pos.offset(0, 2, -3), pos.offset(1, 2, -3)]
         for (let i in coordinates) {
-            if (level.getBlock(coordinates[i]) == "gtceu:tempered_glass") {
+            if (level.getBlock(coordinates[i]).getId() == "gtceu:tempered_glass") {
                 return level.getBlock(coordinates[i].offset(0, 1, 0)).getSkyLight()
             }
         }
@@ -85,7 +82,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             if (getGreenhouseLight(machine) > 0) {
                 return true
             }
-            machine.getRecipeLogic().resetRecipeLogic()
+            machine.getRecipeLogic().interruptRecipe()
             return false
         })
         .onWorking(machine => {
@@ -140,7 +137,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             let pos = machine.self().getPos()
             let coordinates = [[pos.offset(5, 0, 0), pos.offset(7, 3, 0)], [pos.offset(-5, 0, 0), pos.offset(-7, 3, 0)], [pos.offset(0, 0, -5), pos.offset(0, 3, -7)], [pos.offset(0, 0, 5), pos.offset(0, 3, 7)]]
             for (let n in coordinates) {
-                if (level.getBlock(coordinates[n][0]) == "kubejs:stellar_containment_casing") {
+                if (level.getBlock(coordinates[n][0]).getId() == "kubejs:stellar_containment_casing") {
                     level.createExplosion(coordinates[n][1].getX(), coordinates[n][1].getY(), coordinates[n][1].getZ()).strength(10).explosionMode("none").explode()
                 }
             }
@@ -507,12 +504,10 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_inert_ptfe", "gtceu:block/machines/chemical_reactor")
 
     function getAdvancedHyperReactorMaxParallel(machine) {
-        if (machine.input(true, ContentBuilder().fluid("gtceu:starmetal_plasma 1").build()).isSuccess()) {
-            machine.input(false, ContentBuilder().fluid("gtceu:starmetal_plasma 1").build())
+        if (machine.inputFluid("gtceu:starmetal_plasma 1")) {
             return 8
         }
-        if (machine.input(true, ContentBuilder().fluid("gtceu:dense_neutron_plasma 1").build()).isSuccess()) {
-            machine.input(false, ContentBuilder().fluid("gtceu:dense_neutron_plasma 1").build())
+        if (machine.inputFluid("gtceu:dense_neutron_plasma 1")) {
             return 16
         }
     }
@@ -554,26 +549,22 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         let canParallel = false
         switch ($RecipeHelper.getOutputEUt(recipe)) {
             case GTValues.V[GTValues.UHV]:
-                if (machine.input(true, ContentBuilder().fluid("gtceu:orichalcum_plasma 1").build()).isSuccess()) {
-                    machine.input(false, ContentBuilder().fluid("gtceu:orichalcum_plasma 1").build())
+                if (machine.inputFluid("gtceu:orichalcum_plasma 1")) {
                     canParallel = true
                 }
                 break
             case GTValues.V[GTValues.UEV]:
-                if (machine.input(true, ContentBuilder().fluid("gtceu:enderium_plasma 1").build()).isSuccess()) {
-                    machine.input(false, ContentBuilder().fluid("gtceu:enderium_plasma 1").build())
+                if (machine.inputFluid("gtceu:enderium_plasma 1")) {
                     canParallel = true
                 }
                 break
             case GTValues.V[GTValues.UIV]:
-                if (machine.input(true, ContentBuilder().fluid("gtceu:infuscolium_plasma 1").build()).isSuccess()) {
-                    machine.input(false, ContentBuilder().fluid("gtceu:infuscolium_plasma 1").build())
+                if (machine.inputFluid("gtceu:infuscolium_plasma 1")) {
                     canParallel = true
                 }
                 break
             case GTValues.V[GTValues.UXV]:
-                if (machine.input(true, ContentBuilder().fluid("gtceu:metastable_hassium_plasma 1").build()).isSuccess()) {
-                    machine.input(false, ContentBuilder().fluid("gtceu:metastable_hassium_plasma 1").build())
+                if (machine.inputFluid("gtceu:metastable_hassium_plasma 1")) {
                     canParallel = true
                 }
                 break
@@ -636,10 +627,10 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .build())
         .workableCasingRenderer("kubejs:block/hyper_mechanical_casing", "gtceu:block/multiblock/fusion_reactor")
 
-    event.create("advanced_assembly_line", "multiblock")
+    event.create("advanced_assembly_line", "multiblock", (holder) => new $AssemblyLineMachine(holder))
         .rotationState(RotationState.ALL)
         .recipeType("assembly_line")
-        .recipeModifiers([(machine, recipe) => GTRecipeModifiers.reduction(recipe, 1, 0.6), GTRecipeModifiers.SUBTICK_PARALLEL, GTRecipeModifiers.PARALLEL_HATCH, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK)])
+        .recipeModifiers([GTRecipeModifiers.PARALLEL_HATCH, (machine, recipe) => $AssemblyLineMachine.recipeModifier(machine, recipe)])
         .appearanceBlock(GTBlocks.CASING_STEEL_SOLID)
         .pattern(definition =>
             FactoryBlockPattern.start("back", "up", "right")
@@ -659,22 +650,22 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                     .or(Predicates.abilities(PartAbility.OPTICAL_DATA_RECEPTION).setExactLimit(1)))
                 .where("A", Predicates.blocks("gtceu:assembly_line_casing"))
                 .where("R", Predicates.blocks("gtceu:laminated_glass"))
-                .where("T", Predicates.blocks("kubejs:advanced_assembly_line_unit"))
+                .where("T", Predicates.countBlock("Unit", "kubejs:advanced_assembly_line_unit"))
                 .where("#", Predicates.any())
                 .build())
         .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_solid_steel", "gtceu:block/multiblock/assembly_line")
 
     function getSphereOfHarmonyOC(machine) {
-        if (machine.input(true, ContentBuilder().circuit(4).build()).isSuccess()) {
+        if (machine.notConsumableCircuit(4)) {
             return 3
         }
-        if (machine.input(true, ContentBuilder().circuit(3).build()).isSuccess()) {
+        if (machine.notConsumableCircuit(3)) {
             return 2
         }
-        if (machine.input(true, ContentBuilder().circuit(2).build()).isSuccess()) {
+        if (machine.notConsumableCircuit(2)) {
             return 1
         }
-        if (machine.input(true, ContentBuilder().circuit(1).build()).isSuccess()) {
+        if (machine.notConsumableCircuit(1)) {
             return 0
         }
         return null
@@ -748,12 +739,10 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                     machine.holder.self().getPersistentData().putLong("helium", helium - 1024000000)
                     return $WirelessEnergyManager.addEUToGlobalEnergyMap(uuid, $BigInteger.valueOf(- (5277655810867200 * (8 ** oc))))
                 }
-                if (machine.input(true, ContentBuilder().fluid("gtceu:hydrogen 100000").build()).isSuccess()) {
-                    machine.input(false, ContentBuilder().fluid("gtceu:hydrogen 100000").build())
+                if (machine.inputFluid("gtceu:hydrogen 100000").build()) {
                     machine.holder.self().getPersistentData().putLong("hydrogen", hydrogen + 10000000)
                 }
-                if (machine.input(true, ContentBuilder().fluid("gtceu:helium 1000000").build()).isSuccess()) {
-                    machine.input(false, ContentBuilder().fluid("gtceu:helium 1000000").build())
+                if (machine.inputFluid("gtceu:helium 1000000")) {
                     machine.holder.self().getPersistentData().putLong("helium", helium + 10000000)
                 }
             }
@@ -816,11 +805,11 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             let pos = machine.self().getPos()
             let coordinates = [pos.offset(4, 8, 0), pos.offset(-4, 8, 0), pos.offset(0, 8, 4), pos.offset(0, 8, -4)]
             for (let a in coordinates) {
-                if (level.getBlock(coordinates[a]) == "gtceu:black_titanium_frame") {
+                if (level.getBlock(coordinates[a]).getId() == "gtceu:black_titanium_frame") {
                     for (let i = -6; i < 7; i++) {
                         for (let j = -6; j < 7; j++) {
                             if (level.getBlock(coordinates[a].offset(i, 1, j)).getSkyLight() == 0) {
-                                machine.getRecipeLogic().resetRecipeLogic()
+                                machine.getRecipeLogic().interruptRecipe()
                                 return false
                             }
                         }
@@ -828,7 +817,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                     return true
                 }
             }
-            machine.getRecipeLogic().resetRecipeLogic()
+            machine.getRecipeLogic().interruptRecipe()
             return false
         })
         .workableCasingRenderer("gtceu:block/casings/gcym/atomic_casing", "gtceu:block/multiblock/data_bank")
@@ -903,7 +892,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             } else if (recipe.data.getInt("ebf_temp") <= machine.getCoilType().getCoilTemperature()) {
                 return true
             }
-            machine.getRecipeLogic().resetRecipeLogic()
+            machine.getRecipeLogic().interruptRecipe()
             return false
         })
         .additionalDisplay((controller, components) => {
@@ -1082,7 +1071,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .rotationState(RotationState.NON_Y_AXIS)
         .allowExtendedFacing(false)
         .recipeType("space_elevator")
-        .recipeModifier(GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic(1, 1)))
+        .recipeModifier(GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic(1, 4)))
         .appearanceBlock(() => Block.getBlock("kubejs:space_elevator_mechanical_casing"))
         .pattern(definition =>
             FactoryBlockPattern.start("right", "down", "front")
@@ -1140,7 +1129,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .build())
         .workableCasingRenderer("kubejs:block/space_elevator_mechanical_casing", "gtceu:block/space_elevator")
 
-    function isSpaceElevatorModule(machine) {
+    function getSpaceElevatorModule(machine) {
         let level = machine.self().getLevel()
         let pos = machine.self().getPos()
         let coordinates = [pos.offset(8, -2, 3),
@@ -1152,27 +1141,34 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         pos.offset(3, -2, -8),
         pos.offset(-3, -2, -8)]
         for (let i in coordinates) {
-            if (level.getBlock(coordinates[i]) == "gtceu:power_core") {
+            if (level.getBlock(coordinates[i]).getId() == "gtceu:power_core") {
                 let coordinatess = [coordinates[i].offset(3, 2, 0),
                 coordinates[i].offset(-3, 2, 0),
                 coordinates[i].offset(0, 2, 3),
                 coordinates[i].offset(0, 2, -3)]
                 for (let j in coordinatess) {
-                    let logic = gtch.getRecipeLogic(level, coordinatess[j], null)
+                    let logic = $GTCapabilityHelper.getRecipeLogic(level, coordinatess[j], null)
                     if (logic != null && logic.getMachine().self().getRecipeType() == GTRecipeTypes.get("space_elevator") && logic.isWorking() && logic.getProgress() > 80) {
-                        return true
+                        return logic.machine.self().getTier() - 8
                     }
                 }
             }
         }
-        return false
+        return -1
     }
 
     event.create("assembler_module", "multiblock")
         .rotationState(RotationState.NON_Y_AXIS)
         .allowExtendedFacing(false)
         .recipeType("assembler_module")
-        .recipeModifiers([GTRecipeModifiers.SUBTICK_PARALLEL, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
+        .recipeModifiers([(machine, recipe) => {
+            let tier = getSpaceElevatorModule(machine)
+            if (tier < 0) {
+                return null
+            } else {
+                return GTRecipeModifiers.reduction(recipe, 1, Math.pow(0.8, tier))
+            }
+        }, GTRecipeModifiers.SUBTICK_PARALLEL, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
         .appearanceBlock(() => Block.getBlock("kubejs:space_elevator_mechanical_casing"))
         .pattern((definition) =>
             FactoryBlockPattern.start()
@@ -1186,26 +1182,20 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .where("a", Predicates.blocks("kubejs:module_base"))
                 .where("c", Predicates.blocks("kubejs:module_connector"))
                 .build())
-        .beforeWorking(machine => {
-            if (isSpaceElevatorModule(machine)) {
-                return true
-            }
-            machine.getRecipeLogic().resetRecipeLogic()
-            return false
-        })
         .onWorking(machine => {
             if (machine.getOffsetTimer() % 20 == 0) {
-                if (isSpaceElevatorModule(machine)) {
-                    return true
+                if (getSpaceElevatorModule(machine) < 0) {
+                    machine.getRecipeLogic().interruptRecipe()
+                    return false
                 }
-                machine.getRecipeLogic().resetRecipeLogic()
-                return false
             }
             return true
         })
         .additionalDisplay((controller, components) => {
             if (controller.isFormed()) {
-                components.add(Component.literal("该模块" + (isSpaceElevatorModule(controller) ? "已" : "未") + "成功安装"))
+                let tier = getSpaceElevatorModule(controller)
+                components.add(Component.literal("该模块" + (tier < 0 ? "未" : "已") + "成功安装"))
+                components.add(Component.literal("耗时倍数x" + Math.pow(0.8, tier)))
             }
         })
         .workableCasingRenderer("kubejs:block/space_elevator_mechanical_casing", "gtceu:block/multiblock/gcym/large_assembler")
@@ -1215,7 +1205,14 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .allowExtendedFacing(false)
         .recipeType("miner_module")
         .recipeType("drilling_module")
-        .recipeModifiers([GTRecipeModifiers.SUBTICK_PARALLEL, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
+        .recipeModifiers([(machine, recipe) => {
+            let tier = getSpaceElevatorModule(machine)
+            if (tier < 0) {
+                return null
+            } else {
+                return GTRecipeModifiers.reduction(recipe, 1, Math.pow(0.8, tier))
+            }
+        }, GTRecipeModifiers.SUBTICK_PARALLEL, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
         .appearanceBlock(() => Block.getBlock("kubejs:space_elevator_mechanical_casing"))
         .pattern((definition) =>
             FactoryBlockPattern.start()
@@ -1228,26 +1225,20 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .where("a", Predicates.blocks("kubejs:module_base"))
                 .where("c", Predicates.blocks("kubejs:module_connector"))
                 .build())
-        .beforeWorking(machine => {
-            if (isSpaceElevatorModule(machine)) {
-                return true
-            }
-            machine.getRecipeLogic().resetRecipeLogic()
-            return false
-        })
         .onWorking(machine => {
             if (machine.getOffsetTimer() % 20 == 0) {
-                if (isSpaceElevatorModule(machine)) {
-                    return true
+                if (getSpaceElevatorModule(machine) < 0) {
+                    machine.getRecipeLogic().interruptRecipe()
+                    return false
                 }
-                machine.getRecipeLogic().resetRecipeLogic()
-                return false
             }
             return true
         })
         .additionalDisplay((controller, components) => {
             if (controller.isFormed()) {
-                components.add(Component.literal("该模块" + (isSpaceElevatorModule(controller) ? "已" : "未") + "成功安装"))
+                let tier = getSpaceElevatorModule(controller)
+                components.add(Component.literal("该模块" + (tier < 0 ? "未" : "已") + "成功安装"))
+                components.add(Component.literal("耗时倍数x" + Math.pow(0.8, tier)))
             }
         })
         .workableCasingRenderer("kubejs:block/space_elevator_mechanical_casing", "gtceu:block/multiblock/gcym/large_assembler")
@@ -1314,10 +1305,9 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                     let pos_0 = poses[Math.floor(Math.random() * poses.length)]
                     if (pos_0 != pos) {
                         pos = pos_0
-                        let block = level.getBlockState(machine.self().getPos().offset(pos[0], pos[1], pos[2])).getBlock()
-                        block = mcbr.BLOCK.getKey(block).toString()
+                        let block = level.getBlock(machine.self().getPos().offset(pos[0], pos[1], pos[2])).getId()
                         if (block in cov_recipe) {
-                            level.setBlockAndUpdate(machine.self().getPos().offset(pos[0], pos[1], pos[2]), mcbr.BLOCK.get(mcrl(cov_recipe[block])).defaultBlockState())
+                            level.setBlockAndUpdate(machine.self().getPos().offset(pos[0], pos[1], pos[2]), Block.getBlock(cov_recipe[block]).defaultBlockState())
                         }
                     } else {
                         i--
@@ -1779,37 +1769,23 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .where(" ", Predicates.any())
                 .build())
         .addCallBack("requestCWUt", machine => {
-            let tier = machine.self().getTier()
-            if (tier < 12 && machine.input(true, ContentBuilder().eu(GTValues.V[GTValues.UIV]).build()).isSuccess() && machine.input(true, ContentBuilder().item("kubejs:optical_mainframe").build()).isSuccess()) {
-                machine.input(false, ContentBuilder().eu(GTValues.V[GTValues.UIV]).build())
-                return 512
-            }
-            if (tier < 13 && machine.input(true, ContentBuilder().eu(GTValues.V[GTValues.UXV]).build()).isSuccess() && machine.input(true, ContentBuilder().item("kubejs:exotic_mainframe").build()).isSuccess()) {
-                machine.input(false, ContentBuilder().eu(GTValues.V[GTValues.UXV]).build())
-                return 1024
-            }
-            if (tier < 14 && machine.input(true, ContentBuilder().eu(GTValues.V[GTValues.OpV]).build()).isSuccess() && machine.input(true, ContentBuilder().item("kubejs:cosmic_mainframe").build()).isSuccess()) {
-                machine.input(false, ContentBuilder().eu(GTValues.V[GTValues.OpV]).build())
-                return 2048
-            }
-            if (machine.input(true, ContentBuilder().eu(GTValues.V[GTValues.MAX]).build()).isSuccess() && machine.input(true, ContentBuilder().item("kubejs:supracausal_mainframe").build()).isSuccess()) {
-                machine.input(false, ContentBuilder().eu(GTValues.V[GTValues.MAX]).build())
-                return 4096
-            }
-            return 0
+            return 2 ** machine.self().getTier()
         })
         .addCallBack("getMaxCWUt", machine => {
             let tier = machine.self().getTier()
-            if (tier > 13) {
-                return 4096
-            }
-            if (tier > 12) {
-                return 2048
-            }
-            if (tier > 11) {
+            if (tier < 12 && machine.notConsumableItem(Item.of("kubejs:optical_mainframe", 8))) {
                 return 1024
             }
-            return 512
+            if (tier < 13 && machine.notConsumableItem(Item.of("kubejs:exotic_mainframe", 8))) {
+                return 2048
+            }
+            if (tier < 14 && machine.notConsumableItem(Item.of("kubejs:cosmic_mainframe", 8))) {
+                return 4096
+            }
+            if (machine.notConsumableItem(Item.of("kubejs:supracausal_mainframe", 8))) {
+                return 8192
+            }
+            return 0
         })
         .workableCasingRenderer("gtceu:block/casings/hpca/computer_casing/back", "gtceu:block/super_computation")
 
@@ -1988,7 +1964,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             .where("#", Predicates.air())
             .build())
         .beforeWorking(machine => {
-            if (machine.input(true, ContentBuilder().fluid("gtceu:blaze " + (2 ** (machine.self().getTier() - 2)) * 10).build()).isSuccess()) {
+            if (machine.inputFluid("gtceu:blaze " + (2 ** (machine.self().getTier() - 2)) * 10)) {
                 return true
             }
             machine.getRecipeLogic().interruptRecipe()
@@ -1997,8 +1973,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .onWorking(machine => {
             if (machine.getOffsetTimer() % 20 == 0) {
                 let tier = machine.self().getTier()
-                if (machine.input(true, ContentBuilder().fluid("gtceu:blaze " + (2 ** (tier - 2)) * 10).build()).isSuccess()) {
-                    machine.input(false, ContentBuilder().fluid("gtceu:blaze " + (2 ** (tier - 2)) * 10).build())
+                if (machine.inputFluid("gtceu:blaze " + (2 ** (tier - 2)) * 10)) {
                     return true
                 }
                 machine.getRecipeLogic().setProgress(0)
@@ -2030,7 +2005,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             .where("#", Predicates.blocks("gtceu:luv_hermetic_casing"))
             .build())
         .beforeWorking(machine => {
-            if (machine.input(true, ContentBuilder().fluid("gtceu:ice " + (2 ** (machine.self().getTier())) * 10).build()).isSuccess()) {
+            if (machine.inputFluid("gtceu:ice " + (2 ** (machine.self().getTier())) * 10)) {
                 return true
             }
             machine.getRecipeLogic().interruptRecipe()
@@ -2039,8 +2014,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .onWorking(machine => {
             if (machine.getOffsetTimer() % 20 == 0) {
                 let tier = machine.self().getTier()
-                if (machine.input(true, ContentBuilder().fluid("gtceu:ice " + (2 ** (tier)) * 10).build()).isSuccess()) {
-                    machine.input(false, ContentBuilder().fluid("gtceu:ice " + (2 ** (tier)) * 10).build())
+                if (machine.inputFluid("gtceu:ice " + (2 ** (tier)) * 10)) {
                     return true
                 }
                 machine.getRecipeLogic().setProgress(0)
@@ -2262,7 +2236,16 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .allowExtendedFacing(false)
         .allowFlip(false)
         .recipeType("bedrock_drilling_rig")
-        .recipeModifiers([GTRecipeModifiers.SUBTICK_PARALLEL, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK)])
+        .recipeModifiers([(machine, recipe) => {
+            let level = machine.self().getLevel()
+            if (Math.random() < 0.1) {
+                level.setBlockAndUpdate(machine.self().getPos().offset(0, -9, 0), Blocks.AIR.defaultBlockState())
+            }
+            if (level.getBlock(machine.self().getPos().offset(0, -9, 0)).getId() == "minecraft:bedrock") {
+                return recipe
+            }
+            return null
+        }, GTRecipeModifiers.SUBTICK_PARALLEL, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK)])
         .appearanceBlock(() => Block.getBlock("kubejs:echo_casing"))
         .pattern(definition => FactoryBlockPattern.start()
             .aisle("aaaaaaaaaaa", "a         a", "a         a", "ab       ba", "a         a", "a         a", "a         a", "a    b    a", "aaaaaaaaaaa")
@@ -2290,18 +2273,6 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             .where("g", Predicates.blocks("kubejs:machine_casing_grinding_head"))
             .where(" ", Predicates.any())
             .build())
-        .beforeWorking(machine => {
-            let level = machine.self().getLevel()
-            if (Math.random() < 0.1) {
-                let pos = machine.self().getPos().offset(0, -9, 0)
-                level.getServer().runCommandSilent(`execute in ${level.getDimension()} run fill ${pos.x} ${pos.y} ${pos.z} ${pos.x} ${pos.y} ${pos.z} minecraft:air`)
-            }
-            if (mcbr.BLOCK.getKey(level.getBlockState(machine.self().getPos().offset(0, -9, 0)).getBlock()).toString() == "minecraft:bedrock") {
-                return true
-            }
-            machine.getRecipeLogic().interruptRecipe()
-            return false
-        })
         .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_sturdy_hsse", "gtceu:block/multiblock/cleanroom")
 
     event.create("cooling_tower", "multiblock")
@@ -2450,15 +2421,12 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             if (machine.getRecipeLogic().getProgress() == 19) {
                 let level = machine.self().getLevel()
                 let pos = machine.self().getPos().offset(0, -16, 0)
-                let block = level.getBlockState(pos).getBlock()
-                block = mcbr.BLOCK.getKey(block).toString()
-                if (machine.input(true, ContentBuilder().item("kubejs:chain_command_block_core").build()).isSuccess() && block == "kubejs:command_block_broken") {
-                    machine.input(false, ContentBuilder().item("kubejs:chain_command_block_core").build())
-                    level.setBlockAndUpdate(pos, mcbr.BLOCK.get(mcrl("minecraft:chain_command_block")).defaultBlockState())
+                let block = level.getBlock(pos).getId()
+                if (machine.inputItem(Item.of("kubejs:chain_command_block_core")) && block == "kubejs:command_block_broken") {
+                    level.setBlockAndUpdate(pos, Block.getBlock("minecraft:chain_command_block").defaultBlockState())
                 }
-                if (machine.input(true, ContentBuilder().item("kubejs:repeating_command_block_core").build()).isSuccess() && block == "kubejs:chain_command_block_broken") {
-                    machine.input(false, ContentBuilder().item("kubejs:repeating_command_block_core").build())
-                    level.setBlockAndUpdate(pos, mcbr.BLOCK.get(mcrl("minecraft:repeating_command_block")).defaultBlockState())
+                if (machine.inputItem(Item.of("kubejs:repeating_command_block_core")) && block == "kubejs:chain_command_block_broken") {
+                    level.setBlockAndUpdate(pos, Block.getBlock("minecraft:repeating_command_block").defaultBlockState())
                 }
             }
             return true
@@ -2512,8 +2480,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             .where("c", Predicates.blocks("kubejs:create_hpca_component"))
             .build())
         .addCallBack("requestCWUt", machine => {
-            if (machine.input(true, create_hpca_content).isSuccess()) {
-                machine.input(false, create_hpca_content)
+            if (machine.inputEU(GTValues.V[GTValues.MAX])) {
                 return GTValues.V[GTValues.MAX]
             }
             return 0
@@ -2532,7 +2499,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         pos.offset(0, 0, 3),
         pos.offset(0, 0, -3)]
         for (let i in coordinates) {
-            let logic = gtch.getRecipeLogic(level, coordinates[i], null)
+            let logic = $GTCapabilityHelper.getRecipeLogic(level, coordinates[i], null)
             if (logic != null && logic.getMachine().self().getBlockState().getBlock().getId() == "gtceu:suprachronal_assembly_line_module" && logic.getMachine().self().isFormed()) {
                 a++
             }
@@ -2611,7 +2578,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             if (getSuprachronalAssemblyLineModule(machine) < 3) {
                 return true
             }
-            machine.getRecipeLogic().resetRecipeLogic()
+            machine.getRecipeLogic().interruptRecipe()
             return false
         })
         .additionalDisplay((controller, components) => {
@@ -2629,7 +2596,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         pos.offset(0, 0, 3),
         pos.offset(0, 0, -3)]
         for (let i in coordinates) {
-            let logic = gtch.getRecipeLogic(level, coordinates[i], null)
+            let logic = $GTCapabilityHelper.getRecipeLogic(level, coordinates[i], null)
             if (logic != null && logic.getMachine().self().getBlockState().getBlock().getId() == "gtceu:suprachronal_assembly_line" && logic.getMachine().self().isFormed()) {
                 return logic.getMachine()
             }
@@ -2671,7 +2638,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             if (getSuprachronalAssemblyLine(machine) != null) {
                 return true
             }
-            machine.getRecipeLogic().resetRecipeLogic()
+            machine.getRecipeLogic().interruptRecipe()
             return false
         })
         .additionalDisplay((controller, components) => {
@@ -3164,31 +3131,30 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .recipeModifier((machine, recipe) => $SteamParallelMultiblockMachine.recipeModifier(machine, recipe, 0.5), true)
         .appearanceBlock(GTBlocks.CASING_BRONZE_BRICKS)
         .pattern(definition => FactoryBlockPattern.start()
-            .aisle("AAAAA", "AAAAA", "AAAAA", "AAAAA", "     ")
-            .aisle("AAAAA", "ABCBA", "ADEDA", "AFGFA", " AAA ")
-            .aisle("AAAAA", "ABCBA", "ADEDA", "AFGFA", " AAA ")
-            .aisle("AAAAA", "ABCBA", "ADEDA", "AFGFA", " AAA ")
-            .aisle("AAAAA", "ABCBA", "ADEDA", "AFGFA", " AAA ")
-            .aisle("AAAAA", "ABCBA", "ADEDA", "AFGFA", " AAA ")
-            .aisle("AAAAA", "ABCBA", "ADEDA", "AFGFA", " AAA ")
-            .aisle("AAAAA", "AAAAA", "AASAA", "AAAAA", "     ")
+            .aisle("AAA", "AAA", "DDD", " D ")
+            .aisle("AAA", "ABA", "DCD", " D ")
+            .aisle("AAA", "ABA", "DCD", " D ")
+            .aisle("AAA", "ABA", "DCD", " D ")
+            .aisle("AAA", "ABA", "DCD", " D ")
+            .aisle("AAA", "ABA", "DCD", " D ")
+            .aisle("AAA", "ABA", "DCD", " D ")
+            .aisle("AAA", "ABA", "DCD", " D ")
+            .aisle("AAA", "ABA", "DCD", " D ")
+            .aisle("AAA", "ASA", "DDD", " D ")
             .where("S", Predicates.controller(Predicates.blocks(definition.get())))
-            .where("B", Predicates.blocks("gtceu:steel_brick_casing"))
-            .where("C", Predicates.blocks("gtceu:bronze_machine_casing"))
-            .where("D", Predicates.blocks("gtceu:bronze_brick_casing"))
-            .where("E", Predicates.blocks("minecraft:crafting_table"))
-            .where("F", Predicates.blocks("gtceu:treated_wood_fence"))
-            .where("G", Predicates.blocks("gtceu:bronze_pipe_casing"))
-            .where("A", Predicates.blocks(GTBlocks.CASING_BRONZE_BRICKS.get())
-                .or(Predicates.abilities(PartAbility.STEAM).setExactLimit(1))
+            .where("A", Predicates.blocks("gtceu:steam_machine_casing")
+                .or(Predicates.abilities(PartAbility.STEAM).setExactLimit(1)))
+            .where("B", Predicates.blocks("gtceu:bronze_pipe_casing"))
+            .where("C", Predicates.blocks("kubejs:steam_assembly_block"))
+            .where("D", Predicates.blocks("gtceu:steam_machine_casing")
                 .or(Predicates.abilities(PartAbility.STEAM_IMPORT_ITEMS).setMaxGlobalLimited(1))
                 .or(Predicates.abilities(PartAbility.STEAM_EXPORT_ITEMS).setMaxGlobalLimited(1))
-                .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS).setMaxGlobalLimited(1))
+                .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS).setMaxGlobalLimited(2))
                 .or(Predicates.abilities(PartAbility.IMPORT_ITEMS).setMaxGlobalLimited(2))
                 .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setMaxGlobalLimited(1)))
             .where(" ", Predicates.any())
             .build())
-        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_bronze_plated_bricks", "gtceu:block/multiblock/steam_grinder")
+        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_bronze_plated_bricks", "gtceu:block/multiblock/steam_circuit_assembler")
 
     event.create("large_steam_mixer", "multiblock", (holder) => new $SteamParallelMultiblockMachine(holder, 64))
         .rotationState(RotationState.ALL)
@@ -3219,7 +3185,38 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setMaxGlobalLimited(1)))
             .where(" ", Predicates.any())
             .build())
-        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_bronze_plated_bricks", "gtceu:block/multiblock/steam_grinder")
+        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_bronze_plated_bricks", "gtceu:block/multiblock/steam_mixer")
+
+    event.create("steam_mixer", "multiblock", (holder) => new $SteamParallelMultiblockMachine(holder, 8))
+        .rotationState(RotationState.ALL)
+        .recipeType(GTRecipeTypes.MIXER_RECIPES)
+        .recipeModifier((machine, recipe) => $SteamParallelMultiblockMachine.recipeModifier(machine, recipe, 0.8), true)
+        .appearanceBlock(GTBlocks.CASING_BRONZE_BRICKS)
+        .pattern(definition => FactoryBlockPattern.start()
+            .aisle(" AAA ", " AAA ", " AAA ")
+            .aisle("AAAAA", "ABCBA", "AEEEA")
+            .aisle("AAAAA", "ACDCA", "AEEEA")
+            .aisle("AAAAA", "ABCBA", "AEEEA")
+            .aisle(" AAA ", " ASA ", " AAA ")
+            .where("S", Predicates.controller(Predicates.blocks(definition.get())))
+            .where("A", Predicates.blocks(GTBlocks.CASING_BRONZE_BRICKS.get())
+                .or(Predicates.abilities(PartAbility.STEAM).setExactLimit(1))
+                .or(Predicates.abilities(PartAbility.STEAM_IMPORT_ITEMS).setMaxGlobalLimited(1))
+                .or(Predicates.abilities(PartAbility.STEAM_EXPORT_ITEMS).setMaxGlobalLimited(1))
+                .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS).setMaxGlobalLimited(2))
+                .or(Predicates.abilities(PartAbility.EXPORT_FLUIDS).setMaxGlobalLimited(2))
+                .or(Predicates.abilities(PartAbility.IMPORT_ITEMS).setMaxGlobalLimited(4))
+                .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setMaxGlobalLimited(1)))
+            .where("B", Predicates.air())
+            .where("C", Predicates.blocks("gtceu:bronze_pipe_casing"))
+            .where("D", Predicates.blocks("gtceu:bronze_gearbox"))
+            .where("E", Predicates.blocks(GTBlocks.CASING_BRONZE_BRICKS.get())
+                .or(Predicates.blocks("minecraft:glass"))
+                .or(Predicates.air())
+            )
+            .where(" ", Predicates.any())
+            .build())
+        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_bronze_plated_bricks", "gtceu:block/multiblock/steam_mixer")
 
     event.create("large_steam_centrifuge", "multiblock", (holder) => new $SteamParallelMultiblockMachine(holder, 64))
         .rotationState(RotationState.ALL)
@@ -3253,7 +3250,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setMaxGlobalLimited(4)))
             .where(" ", Predicates.any())
             .build())
-        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_bronze_plated_bricks", "gtceu:block/multiblock/steam_grinder")
+        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_bronze_plated_bricks", "gtceu:block/multiblock/steam_centrifuge")
 
     event.create("large_steam_thermal_centrifuge", "multiblock", (holder) => new $SteamParallelMultiblockMachine(holder, 64))
         .rotationState(RotationState.ALL)
@@ -3281,7 +3278,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setMaxGlobalLimited(3)))
             .where(" ", Predicates.any())
             .build())
-        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_bronze_plated_bricks", "gtceu:block/multiblock/steam_oven")
+        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_bronze_plated_bricks", "gtceu:block/multiblock/steam_thermal_centrifuge")
 
     event.create("large_steam_bath", "multiblock", (holder) => new $SteamParallelMultiblockMachine(holder, 64))
         .rotationState(RotationState.ALL)
@@ -3314,6 +3311,34 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             .build())
         .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_bronze_plated_bricks", "gtceu:block/machines/chemical_bath")
 
+    event.create("steam_bath", "multiblock", (holder) => new $SteamParallelMultiblockMachine(holder, 8))
+        .rotationState(RotationState.ALL)
+        .recipeType(GTRecipeTypes.CHEMICAL_BATH_RECIPES)
+        .recipeModifier((machine, recipe) => $SteamParallelMultiblockMachine.recipeModifier(machine, recipe, 0.8), true)
+        .appearanceBlock(GTBlocks.CASING_BRONZE_BRICKS)
+        .pattern(definition => FactoryBlockPattern.start()
+            .aisle("AAAAA", "AAAAA", "AAAAA")
+            .aisle("AAAAA", "ABCBA", "ADDDA")
+            .aisle("AAAAA", "ABCBA", "ADDDA")
+            .aisle("AAAAA", "AASAA", "AAAAA")
+            .where("S", Predicates.controller(Predicates.blocks(definition.get())))
+            .where("A", Predicates.blocks(GTBlocks.CASING_BRONZE_BRICKS.get())
+                .or(Predicates.abilities(PartAbility.STEAM).setExactLimit(1))
+                .or(Predicates.abilities(PartAbility.STEAM_IMPORT_ITEMS).setMaxGlobalLimited(1))
+                .or(Predicates.abilities(PartAbility.STEAM_EXPORT_ITEMS).setMaxGlobalLimited(1))
+                .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS).setMaxGlobalLimited(2))
+                .or(Predicates.abilities(PartAbility.EXPORT_FLUIDS).setMaxGlobalLimited(2))
+                .or(Predicates.abilities(PartAbility.IMPORT_ITEMS).setMaxGlobalLimited(4))
+                .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setMaxGlobalLimited(1)))
+            .where("B", Predicates.air())
+            .where("C", Predicates.blocks("gtceu:potin_block"))
+            .where("D", Predicates.blocks(GTBlocks.CASING_BRONZE_BRICKS.get())
+                .or(Predicates.blocks("minecraft:glass"))
+                .or(Predicates.air())
+            )
+            .build())
+        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_bronze_plated_bricks", "gtceu:block/machines/chemical_bath")
+
     event.create("large_steam_ore_washer", "multiblock", (holder) => new $SteamParallelMultiblockMachine(holder, 64))
         .rotationState(RotationState.ALL)
         .recipeType(GTRecipeTypes.ORE_WASHER_RECIPES)
@@ -3342,7 +3367,34 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setMaxGlobalLimited(3)))
             .where(" ", Predicates.air())
             .build())
-        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_bronze_plated_bricks", "gtceu:block/machines/chemical_bath")
+        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_bronze_plated_bricks", "gtceu:block/multiblock/steam_ore_washer")
+
+    event.create("steam_ore_washer", "multiblock", (holder) => new $SteamParallelMultiblockMachine(holder, 8))
+        .rotationState(RotationState.ALL)
+        .recipeType(GTRecipeTypes.ORE_WASHER_RECIPES)
+        .recipeModifier((machine, recipe) => $SteamParallelMultiblockMachine.recipeModifier(machine, recipe, 0.8), true)
+        .appearanceBlock(GTBlocks.CASING_BRONZE_BRICKS)
+        .pattern(definition => FactoryBlockPattern.start()
+            .aisle("AAAAA", "AAAAA", "AAAAA")
+            .aisle("AAAAA", "A C A", "A E A")
+            .aisle("AAAAA", "ACDCA", "AEDEA")
+            .aisle("AAAAA", "A C A", "A E A")
+            .aisle("AAAAA", "AASAA", "AAAAA")
+            .where("S", Predicates.controller(Predicates.blocks(definition.get())))
+            .where("A", Predicates.blocks(GTBlocks.CASING_BRONZE_BRICKS.get())
+                .or(Predicates.abilities(PartAbility.STEAM).setExactLimit(1))
+                .or(Predicates.abilities(PartAbility.STEAM_IMPORT_ITEMS).setMaxGlobalLimited(1))
+                .or(Predicates.abilities(PartAbility.STEAM_EXPORT_ITEMS).setMaxGlobalLimited(1))
+                .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS).setMaxGlobalLimited(2))
+                .or(Predicates.abilities(PartAbility.EXPORT_FLUIDS).setMaxGlobalLimited(2))
+                .or(Predicates.abilities(PartAbility.IMPORT_ITEMS).setMaxGlobalLimited(4))
+                .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setMaxGlobalLimited(1)))
+            .where("C", Predicates.blocks("gtceu:bronze_frame"))
+            .where("D", Predicates.blocks("gtceu:bronze_gearbox"))
+            .where("E", Predicates.blocks("gtceu:bronze_pipe_casing"))
+            .where(" ", Predicates.air())
+            .build())
+        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_bronze_plated_bricks", "gtceu:block/multiblock/steam_ore_washer")
 
     event.create("dimensionally_transcendent_dirt_forge", "multiblock")
         .rotationState(RotationState.ALL)
@@ -3465,7 +3517,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .recipeType("lathe")
         .recipeType("macerator")
         .recipeType("centrifuge")
-        .recipeModifiers([GTRecipeModifiers.SUBTICK_PARALLEL, GTRecipeModifiers.PARALLEL_HATCH, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK)])
+        .recipeModifiers([GTRecipeModifiers.SUBTICK_PARALLEL, GTRecipeModifiers.PARALLEL_HATCH, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
         .appearanceBlock(() => Block.getBlock("kubejs:iridium_casing"))
         .pattern(definition =>
             FactoryBlockPattern.start()
@@ -3674,13 +3726,13 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             let level = machine.getLevel()
             let dim = level.getDimension()
             let server = level.getServer()
-            if (machine.input(true, ContentBuilder().circuit(1).build()).isSuccess()) {
+            if (machine.notConsumableCircuit(1)) {
                 server.runCommandSilent(`execute in ${dim} run weather clear`)
             }
-            if (machine.input(true, ContentBuilder().circuit(2).build()).isSuccess()) {
+            if (machine.notConsumableCircuit(2)) {
                 server.runCommandSilent(`execute in ${dim} run weather rain`)
             }
-            if (machine.input(true, ContentBuilder().circuit(3).build()).isSuccess()) {
+            if (machine.notConsumableCircuit(3)) {
                 server.runCommandSilent(`execute in ${dim} run weather thunder`)
             }
         })
@@ -3816,8 +3868,8 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .aisle("AAB   AAA   BAA", "CAB   A~A   BAC", "CAB   AAA   BAC", "C             C", "C             C", "C             C", "C     BBB     C", "C     AAA     C", "CCCCCCCCCCCCCCC")
                 .where("~", Predicates.controller(Predicates.blocks(definition.get())))
                 .where("A", Predicates.blocks("kubejs:iridium_casing")
-                    .or(Predicates.abilities(PartAbility.IMPORT_ITEMS).setMaxGlobalLimited(8))
-                    .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setMaxGlobalLimited(8))
+                    .or(Predicates.abilities(PartAbility.IMPORT_ITEMS).setMaxGlobalLimited(24))
+                    .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setMaxGlobalLimited(24))
                     .or(Predicates.abilities(PartAbility.INPUT_ENERGY).setMaxGlobalLimited(2))
                     .or(Predicates.abilities(PartAbility.INPUT_LASER).setMaxGlobalLimited(1))
                     .or(Predicates.abilities(PartAbility.PARALLEL_HATCH).setMaxGlobalLimited(1))
@@ -3861,7 +3913,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             if (recipe.data.getInt("nano_forge_tier") == 1 && machine.getMachineStorageItem().getId() == "gtceu:carbon_nanoswarm") {
                 return true
             }
-            machine.getRecipeLogic().resetRecipeLogic()
+            machine.getRecipeLogic().interruptRecipe()
             return false
         })
         .additionalDisplay((controller, components) => {
@@ -3909,7 +3961,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             if (recipe.data.getInt("nano_forge_tier") < 3 && machine.getMachineStorageItem().getId() == "gtceu:neutronium_nanoswarm") {
                 return true
             }
-            machine.getRecipeLogic().resetRecipeLogic()
+            machine.getRecipeLogic().interruptRecipe()
             return false
         })
         .additionalDisplay((controller, components) => {
@@ -3958,7 +4010,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             if (machine.getMachineStorageItem().getId() == "gtceu:draconium_nanoswarm") {
                 return true
             }
-            machine.getRecipeLogic().resetRecipeLogic()
+            machine.getRecipeLogic().interruptRecipe()
             return false
         })
         .additionalDisplay((controller, components) => {
@@ -4008,7 +4060,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             if (recipe.data.getInt("ebf_temp") <= machine.getCoilType().getCoilTemperature()) {
                 return true
             }
-            machine.getRecipeLogic().resetRecipeLogic()
+            machine.getRecipeLogic().interruptRecipe()
             return false
         })
         .additionalDisplay((controller, components) => {
@@ -4252,4 +4304,65 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             }
         })
         .workableCasingRenderer("kubejs:block/molecular_casing", "gtceu:block/multiblock/fusion_reactor")
+
+    event.create("mega_extractor", "multiblock", (holder) => new $CoilWorkableElectricMultiblockMachine(holder))
+        .rotationState(RotationState.ALL)
+        .recipeType("extractor")
+        .recipeType("fluid_solidifier")
+        .recipeModifiers([GTRecipeModifiers.SUBTICK_PARALLEL, (machine, recipe) => GTRecipeModifiers.accurateParallel(machine, recipe, Math.min(2147483647, 2 ** (machine.getCoilType().getCoilTemperature() / 900)), false).getFirst(), GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
+        .appearanceBlock(() => Block.getBlock("kubejs:hyper_mechanical_casing"))
+        .pattern((definition) =>
+            FactoryBlockPattern.start()
+                .aisle("      AAA      ", "      AAA      ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ")
+                .aisle("    AAAAAAA    ", "      AAA      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      AAA      ")
+                .aisle("   AAAAAAAAA   ", "    AAAAAAA    ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "      AAA      ")
+                .aisle("  AAAAAAAAAAA  ", "   AAAAAAAAA   ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "      AAA      ")
+                .aisle(" AAAAAAAAAAAAA ", "  AAAAAAAAAAA  ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "       C       ", "      CCC      ", "       C       ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "     AAAAA     ")
+                .aisle(" AAAAAAAAAAAAA ", "  AAAAAAAAAAA  ", "       D       ", "       D       ", "       D       ", "       D       ", "               ", "               ", "      CCC      ", "     CC CC     ", "     C   C     ", "     CC CC     ", "      CCC      ", "               ", "               ", "       D       ", "       D       ", "       D       ", "       D       ", "    AAAAAAA    ")
+                .aisle("AAAAAAAAAAAAAAA", "AAAAAAAAAAAAAAA", " B    DED    B ", " B    DED    B ", " B    DED    B ", " B    DED    B ", " B     E     B ", " B     C     B ", " B   CC CC   B ", " B   C   C   B ", " B  C     C  B ", " B   C   C   B ", " B   CC CC   B ", " B     C     B ", " B     E     B ", " B    DED    B ", " B    DED    B ", " B    DED    B ", " B    DED    B ", " AAAAAAAAAAAAA ")
+                .aisle("AAAAAAAAAAAAAAA", "AAAAAAAAAAAAAAA", "     DEFED     ", "     DEFED     ", "     DEFED     ", "     DEFED     ", "      EFE      ", "      CFC      ", "     C   C     ", "    C     C    ", "    C     C    ", "    C     C    ", "     C   C     ", "      CFC      ", "      EFE      ", "     DEFED     ", "     DEFED     ", "     DEFED     ", "     DEFED     ", " AAAAAAAAAAAAA ")
+                .aisle("AAAAAAAAAAAAAAA", "AAAAAAAAAAAAAAA", " B    DED    B ", " B    DED    B ", " B    DED    B ", " B    DED    B ", " B     E     B ", " B     C     B ", " B   CC CC   B ", " B   C   C   B ", " B  C     C  B ", " B   C   C   B ", " B   CC CC   B ", " B     C     B ", " B     E     B ", " B    DED    B ", " B    DED    B ", " B    DED    B ", " B    DED    B ", " AAAAAAAAAAAAA ")
+                .aisle(" AAAAAAAAAAAAA ", "  AAAAAAAAAAA  ", "       D       ", "       D       ", "       D       ", "       D       ", "               ", "               ", "      CCC      ", "     CC CC     ", "     C   C     ", "     CC CC     ", "      CCC      ", "               ", "               ", "       D       ", "       D       ", "       D       ", "       D       ", "    AAAAAAA    ")
+                .aisle(" AAAAAAAAAAAAA ", "  AAAAAAAAAAA  ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "       C       ", "      CCC      ", "       C       ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "     AAAAA     ")
+                .aisle("  AAAAAAAAAAA  ", "   AAAAAAAAA   ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "      AAA      ")
+                .aisle("   AAAAAAAAA   ", "    AAAAAAA    ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "      AAA      ")
+                .aisle("    AAAAAAA    ", "      AAA      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      B B      ", "      AAA      ")
+                .aisle("      A~A      ", "      AAA      ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ", "               ")
+                .where("~", Predicates.controller(Predicates.blocks(definition.get())))
+                .where("A", Predicates.blocks("kubejs:hyper_mechanical_casing")
+                    .or(Predicates.autoAbilities(definition.getRecipeTypes()))
+                    .or(Predicates.abilities(PartAbility.INPUT_LASER).setMaxGlobalLimited(1)))
+                .where("B", Predicates.blocks("gtceu:naquadah_alloy_frame"))
+                .where("C", Predicates.blocks("kubejs:iridium_casing"))
+                .where("D", Predicates.heatingCoils())
+                .where("E", Predicates.blocks("kubejs:molecular_casing"))
+                .where("F", Predicates.blocks("gtceu:tungstensteel_pipe_casing"))
+                .build())
+        .additionalDisplay((controller, components) => {
+            if (controller.isFormed()) {
+                components.add(Component.translatable("gtceu.multiblock.parallel", Component.literal($FormattingUtil.formatNumbers(Math.min(2147483647, 2 ** (controller.getCoilType().getCoilTemperature() / 900)))).darkPurple()).gray())
+            }
+        })
+        .workableCasingRenderer("kubejs:block/hyper_mechanical_casing", "gtceu:block/multiblock/gcym/large_extractor")
+
+    event.create("disassembly", "multiblock")
+        .rotationState(RotationState.ALL)
+        .recipeType("disassembly")
+        .recipeModifiers([GTRecipeModifiers.SUBTICK_PARALLEL, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK)])
+        .appearanceBlock(() => Block.getBlock("kubejs:process_machine_casing"))
+        .pattern((definition) =>
+            FactoryBlockPattern.start()
+                .aisle("AAA", "AAA", "AAA")
+                .aisle("AAA", "ABA", "AAA")
+                .aisle("AAA", "A~A", "AAA")
+                .where("~", Predicates.controller(Predicates.blocks(definition.get())))
+                .where("A", Predicates.blocks("kubejs:process_machine_casing")
+                    .or(Predicates.abilities(PartAbility.IMPORT_ITEMS).setMaxGlobalLimited(1))
+                    .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setMaxGlobalLimited(1))
+                    .or(Predicates.abilities(PartAbility.EXPORT_FLUIDS).setMaxGlobalLimited(1))
+                    .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS).setMaxGlobalLimited(1))
+                    .or(Predicates.abilities(PartAbility.INPUT_ENERGY).setMaxGlobalLimited(1)))
+                .where("B", Predicates.blocks("gtceu:assembly_line_unit"))
+                .build())
+        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_solid_steel", "gtceu:block/multiblock/assembly_line")
 })

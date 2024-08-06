@@ -346,6 +346,7 @@
 			dependencies: ["12E605EC5CFDE71A"]
 			icon: "gtceu:creosote_bucket"
 			id: "1ADCD127B6621645"
+			ignore_reward_blocking: true
 			tasks: [{
 				id: "7012AD604451425F"
 				title: "杂酚油"
@@ -369,8 +370,8 @@
 				title: "蒸汽传输"
 				type: "checkmark"
 			}]
-			x: 7.0d
-			y: -0.5d
+			x: 8.0d
+			y: 1.0d
 		}
 		{
 			dependencies: ["46F82A0A3D57C225"]
@@ -437,7 +438,7 @@
 				item: "gtceu:dimensionally_transcendent_dirt_forge"
 				type: "item"
 			}]
-			x: 14.5d
+			x: 14.25d
 			y: 0.0d
 		}
 		{
@@ -532,7 +533,7 @@
 				type: "item"
 			}]
 			x: 9.0d
-			y: 3.5d
+			y: 3.5999999999999996d
 		}
 		{
 			dependencies: ["51F4B817346DEC45"]
@@ -543,6 +544,7 @@
 				"大型的蒸汽多方块都有64的并行，并且处理速度是LV机器的2倍"
 				"非大型的蒸汽多方块为8并行"
 				"蒸汽多方块的外壳可以到小市场购买"
+				"大型蒸汽多方块满并行工作时蒸汽消耗特别大，需要用时空管道或激光节点等高速流体传输手段来提供蒸汽，否则会跳蒸汽"
 			]
 			hide_dependent_lines: true
 			icon: "gtceu:steam_piston_hammer"
@@ -582,7 +584,7 @@
 				type: "checkmark"
 			}]
 			x: 7.0d
-			y: 3.5d
+			y: 3.0d
 		}
 		{
 			dependencies: [
@@ -619,7 +621,7 @@
 				type: "item"
 			}]
 			x: 7.0d
-			y: 1.5d
+			y: 0.0d
 		}
 		{
 			dependencies: ["59D7F512A30C4290"]
@@ -767,7 +769,7 @@
 				"10B5D98AD1BE649E"
 				"327FACDF9807E960"
 			]
-			description: ["蒸汽合金炉的多方块版本"]
+			description: ["蒸汽合金炉的多方块版本，极度推荐做一台"]
 			hide_dependency_lines: true
 			id: "474AB958E64FD64D"
 			rewards: [{
@@ -775,13 +777,14 @@
 				item: "gtceu:cupronickel_credit"
 				type: "item"
 			}]
+			shape: "gear"
 			tasks: [{
 				id: "7688C45439577F0E"
 				item: "gtceu:steam_foundry"
 				type: "item"
 			}]
-			x: 2.5d
-			y: 1.5d
+			x: 4.0d
+			y: 3.5d
 		}
 		{
 			dependencies: [
@@ -887,7 +890,10 @@
 				"1F897E15549B94A6"
 				"06CC5EDA9F5B9726"
 			]
-			description: ["正式进入电力时代"]
+			description: [
+				"正式进入电力时代"
+				"建议先做个一组多"
+			]
 			id: "5749CAD673EE6816"
 			shape: "rsquare"
 			size: 1.2d
@@ -912,12 +918,11 @@
 			y: 6.5d
 		}
 		{
-			dependencies: ["327FACDF9807E960"]
-			hide_dependency_lines: true
+			dependencies: ["1524C538DFFC1F8C"]
 			id: "7FC52CB0D25BFDEA"
 			rewards: [{
-				id: "3347C85A883DE39C"
-				item: "gtceu:cupronickel_credit"
+				id: "720D121DE3F97D4B"
+				item: "gtceu:silver_credit"
 				type: "item"
 			}]
 			tasks: [{
@@ -925,16 +930,15 @@
 				item: "gtceu:large_steam_mixer"
 				type: "item"
 			}]
-			x: 4.0d
+			x: 2.5d
 			y: 3.5d
 		}
 		{
-			dependencies: ["327FACDF9807E960"]
-			hide_dependency_lines: true
+			dependencies: ["33D56FF16ABE1A3E"]
 			id: "22F9FA0498340DA6"
 			rewards: [{
-				id: "00C4DA67D1D38088"
-				item: "gtceu:cupronickel_credit"
+				id: "53E58A0CD46BC52B"
+				item: "gtceu:silver_credit"
 				type: "item"
 			}]
 			tasks: [{
@@ -942,7 +946,7 @@
 				item: "gtceu:large_steam_bath"
 				type: "item"
 			}]
-			x: 2.5d
+			x: 1.0d
 			y: 3.5d
 		}
 		{
@@ -1084,7 +1088,10 @@
 		{
 			can_repeat: true
 			dependencies: ["0626E7D4F9EAB1B2"]
-			description: ["可使用扳手限制流向，注意管道容量特别大"]
+			description: [
+				"可使用扳手限制流向，注意管道容量特别大"
+				"可以当储罐用"
+			]
 			icon: "gtceu:spacetime_tiny_fluid_pipe"
 			id: "77E7A87066C55AA3"
 			rewards: [{
@@ -1151,6 +1158,58 @@
 			}]
 			x: 16.0d
 			y: 6.5d
+		}
+		{
+			dependencies: ["327FACDF9807E960"]
+			description: ["快速处理矿物"]
+			hide_dependency_lines: true
+			id: "566484A8529171B6"
+			rewards: [{
+				id: "048A24828975F5DD"
+				item: "gtceu:silver_credit"
+				type: "item"
+			}]
+			tasks: [{
+				id: "5057A0AC48EF94E9"
+				item: "gtceu:large_steam_thermal_centrifuge"
+				type: "item"
+			}]
+			x: 1.0d
+			y: -0.5d
+		}
+		{
+			dependencies: ["327FACDF9807E960"]
+			hide_dependency_lines: true
+			id: "33D56FF16ABE1A3E"
+			rewards: [{
+				id: "7D224561DE68A90B"
+				item: "gtceu:cupronickel_credit"
+				type: "item"
+			}]
+			tasks: [{
+				id: "3BD1F25AF5F35CD7"
+				item: "gtceu:steam_bath"
+				type: "item"
+			}]
+			x: 1.0d
+			y: 1.5d
+		}
+		{
+			dependencies: ["327FACDF9807E960"]
+			hide_dependency_lines: true
+			id: "1524C538DFFC1F8C"
+			rewards: [{
+				id: "7E568BA18E106578"
+				item: "gtceu:cupronickel_credit"
+				type: "item"
+			}]
+			tasks: [{
+				id: "550B7D97589B3134"
+				item: "gtceu:steam_mixer"
+				type: "item"
+			}]
+			x: 2.5d
+			y: 1.5d
 		}
 	]
 	subtitle: ["Tier0-ULV"]

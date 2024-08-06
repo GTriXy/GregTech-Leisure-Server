@@ -11,7 +11,7 @@ ItemEvents.tooltip(event => {
     event.add("kubejs:command_wand", "需要左手拿着命令方块，且只能放在创造稳定核心上方")
     event.add("kubejs:uruium_coil_block", ["可为超维度等离子锻炉提供32000K炉温", "恒星锻炉模式仅可使用该线圈"])
     event.add(["gtceu:space_elevator", "gtceu:door_of_create", "gtceu:large_rotary", "gtceu:block_conversion_room", "gtceu:create_aggregation"], "运行前需要将电路设置为1")
-    event.add("gtceu:advanced_assembly_line", ["耗时倍数x0.6", "可拓展至64格", "只能使用数据靶仓"])
+    event.add("gtceu:advanced_assembly_line", ["可拓展至64格", "只能使用数据靶仓"])
     event.add("gtceu:weather_control", ["1号电路切换晴天", "2号电路切换雨天", "3号电路切换雷暴"])
     event.add("gtceu:create_aggregation", ["只能在创造维度运行", "需要创造计算机为其提供算力"])
     event.add("gtceu:greenhouse", ["需要阳光才能运行", "如太阳光照不足，速度就会减缓"])
@@ -43,7 +43,7 @@ ItemEvents.tooltip(event => {
     event.add("gtceu:rare_earth_centrifugal", "稀土专用离心机")
     event.add("gtceu:magic_manufacturer", "将电能转化为魔力")
     event.add("gtceu:chemical_distort", ["线圈温度每高出配方温度100K，并行加4", "更高的电压不会提供额外温度"])
-    event.add(["gtceu:dimensional_focus_engraving_array", "gtceu:mega_wiremill", "gtceu:mega_presser"], "线圈温度每高出900K，并行数x2")
+    event.add(["gtceu:dimensional_focus_engraving_array", "gtceu:mega_wiremill", "gtceu:mega_presser", "gtceu:mega_extractor"], "线圈温度每高出900K，并行数x2")
     event.add("gtceu:sps_crafting", "借助魔力合成特殊的物品")
     event.add("gtceu:matter_fabricator", "产出特殊物质")
     event.add(["gtceu:nano_forge_1", "gtceu:nano_forge_2", "gtceu:nano_forge_3"], ["只能使用激光仓", "放入对应的纳米蜂群才能工作，并且按蜂群数量来并行"])
@@ -54,7 +54,7 @@ ItemEvents.tooltip(event => {
     event.add(["gtceu:dimensionally_transcendent_dirt_forge", "gtceu:dimensionally_transcendent_steam_oven"], ["拥有524288的最大并行", "并且直接完成配方"])
     event.add(["gtceu:large_chemical_plant", "gtceu:chemical_plant"], "线圈等级每高出白铜一级能耗降低5%")
     event.add(["gtceu:processing_plant", "gtceu:assemble_plant", "gtceu:separated_plant", "gtceu:mixed_plant"], ["耗能倍数x0.8", "耗时倍数x0.9", "每种模式都需要放入一个对应电压等级的机器才能运行", "电压等级每高出LV一级，最大并行数+4，上限为16"])
-    event.add("gtceu:space_elevator", ["可安装最多8个拓展模块", "查询JEI多方块信息获取模块位置"])
+    event.add("gtceu:space_elevator", ["可安装最多8个拓展模块", "查询JEI多方块信息获取模块位置", "提升电压等级可为模块提供耗时减免"])
     event.add("gtceu:suprachronal_assembly_line_module", "安装在超时空装配线两侧")
     event.add("gtceu:suprachronal_assembly_line", ["§8§l不可视之触", "可在两侧拓展模块，模块与主机共享并行数", "查询JEI多方块信息获取模块位置"])
     event.add(["gtceu:suprachronal_assembly_line_module", "gtceu:suprachronal_assembly_line"], "耗时倍数x0.4")
@@ -68,7 +68,7 @@ ItemEvents.tooltip(event => {
     event.add("gtceu:super_blast_smelter", "耗时倍数x0.2")
     event.add("gtceu:dyson_sphere", ["发射戴森球模块后开始工作", "每次运行都有(模块数量/128 + 1)%的概率损坏一次模块", "当损坏高于60%时，输出效率降低为(100-损坏值)%", "当损坏达到100%时减少一次模块发射数量", "在损坏值高于70%时发射不会增加发射次数，但会将损坏值清零", "产能功率由发射的模块数量决定", "每次发射可使功率增加1A MAX"])
     event.add("gtceu:bedrock_drilling_rig", ["需要基岩在钻头下方", "每次运行都有10%的概率破坏基岩"])
-    event.add("gtceu:super_computation", ["根据不同的电压等级获得算力输出", "且每种算力输出需要不同的电路主机", "提供UIV级电压时，需要放入光学处理器主机，并提供512CWU/t", "提供UXV级电压时，需要放入奇异处理器主机，并提供1024CWU/t", "提供OpV级电压时，需要放入寰宇处理器主机，并提供2048CWU/t", "提供MAX级电压时，需要放入超因果处理器主机，并提供4096CWU/t"])
+    event.add("gtceu:super_computation", ["根据不同的电压等级获得算力输出", "且每种算力输出需要不同的电路主机8个", "提供UIV级电压时，需要放入光学处理器主机，并提供1024CWU/t", "提供UXV级电压时，需要放入奇异处理器主机，并提供2048CWU/t", "提供OpV级电压时，需要放入寰宇处理器主机，并提供4096CWU/t", "提供MAX级电压时，需要放入超因果处理器主机，并提供8192CWU/t"])
     event.add("gtceu:blaze_blast_furnace", ["需每秒提供§b10x(功率÷120)^1/2§r的§e液态烈焰§r", "耗时倍数x0.5", "最大并行数固定为4"])
     event.add("gtceu:cold_ice_freezer", ["需每秒提供§b10x电压等级^2§r的§b液态冰§r", "耗时倍数x0.5", "最大并行数固定为4"])
     event.add("gtceu:annihilate_generator", ["终极质能转换"])
@@ -89,6 +89,7 @@ ItemEvents.tooltip(event => {
         "gtceu:field_extruder_factory",
         "gtceu:mega_presser",
         "gtceu:mega_wiremill",
+        "gtceu:mega_extractor",
         "gtceu:holy_separator",
         "gtceu:crystalline_infinity",
         "gtceu:a_mass_fabricator",
@@ -121,6 +122,8 @@ ItemEvents.tooltip(event => {
         "gtceu:mage_assembler",
         "gtceu:mega_presser",
         "gtceu:mega_wiremill",
+        "gtceu:holy_separator",
+        "gtceu:mega_extractor",
         "gtceu:mass_fabricator",
         "gtceu:a_mass_fabricator",
         "gtceu:star_ultimate_material_forge_factory",

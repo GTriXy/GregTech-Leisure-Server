@@ -4,6 +4,8 @@ GTCEuStartupEvents.registry("gtceu:recipe_type", event => {
     const $FormattingUtil = Java.loadClass("com.gregtechceu.gtceu.utils.FormattingUtil")
     const $ICoilType = Java.loadClass("com.gregtechceu.gtceu.api.block.ICoilType")
     const $I18n = LDLib.isClient() ? Java.loadClass("net.minecraft.client.resources.language.I18n") : null
+    const GenerateDisassembly = Java.loadClass("com.gregtechceu.gtceu.data.recipe.GenerateDisassembly")
+    const ResearchManager = Java.loadClass("com.gregtechceu.gtceu.utils.ResearchManager")
 
     event.create("greenhouse")
         .setEUIO("in")
@@ -182,20 +184,28 @@ GTCEuStartupEvents.registry("gtceu:recipe_type", event => {
         .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
         .setSound(GTSoundEntries.ARC)
 
-    event.create("circuit_assembly_line")
+    GTRecipeTypes.register("circuit_assembly_line", "multiblock")
         .setEUIO("in")
         .setMaxIOSize(16, 1, 4, 0)
         .setSlotOverlay(false, false, GuiTextures.SOLIDIFIER_OVERLAY)
         .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
         .setSound(GTSoundEntries.ASSEMBLER)
+        .onRecipeBuild((recipeBuilder, provider) => {
+            GenerateDisassembly.generateDisassembly(recipeBuilder, provider)
+        })
 
-    event.create("suprachronal_assembly_line")
+    GTRecipeTypes.register("suprachronal_assembly_line", "multiblock")
         .setEUIO("in")
         .setMaxTooltips(4)
         .setMaxIOSize(16, 1, 4, 0)
         .setSlotOverlay(false, false, GuiTextures.SOLIDIFIER_OVERLAY)
         .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
         .setSound(GTSoundEntries.ASSEMBLER)
+        .setHasResearchSlot(true)
+        .onRecipeBuild((recipeBuilder, provider) => {
+            ResearchManager.createDefaultResearchRecipe(recipeBuilder, provider)
+            GenerateDisassembly.generateDisassembly(recipeBuilder, provider)
+        })
 
     event.create("precision_assembler")
         .setEUIO("in")
@@ -321,7 +331,7 @@ GTCEuStartupEvents.registry("gtceu:recipe_type", event => {
         } else {
             recipe["inputFluids(com.lowdragmc.lowdraglib.side.fluid.FluidStack)"](Fluid.of("gtceu:photoresist", value).getFluidStack())
         }
-        return recipe.save(provider)
+        recipe.save(provider)
     })
 
     event.create("precision_laser_engraver")
@@ -396,12 +406,15 @@ GTCEuStartupEvents.registry("gtceu:recipe_type", event => {
         .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
         .setSound(GTSoundEntries.SCIENCE)
 
-    event.create("gravitation_shockburst")
+    GTRecipeTypes.register("gravitation_shockburst", "multiblock")
         .setEUIO("in")
         .setSlotOverlay(false, false, GuiTextures.SOLIDIFIER_OVERLAY)
         .setMaxIOSize(2, 1, 0, 0)
         .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
         .setSound(GTSoundEntries.MACERATOR)
+        .onRecipeBuild((recipeBuilder, provider) => {
+            ResearchManager.createDefaultResearchRecipe(recipeBuilder, provider)
+        })
 
     event.create("ultimate_material_forge")
         .setEUIO("in")
