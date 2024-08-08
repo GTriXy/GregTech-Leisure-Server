@@ -1340,7 +1340,7 @@ ServerEvents.recipes((event) => {
             "64x kubejs:smd_transistor_bioware",
             "64x kubejs:smd_inductor_bioware",
             "64x gtceu:enderite_double_wire",
-            "64x gtceu:seaborgium_bolt")
+            "64x gtceu:quantanium_bolt")
         .inputFluids("gtceu:mutated_living_solder 17280", "gtceu:polyetheretherketone 5760", "gtceu:neutronium 1296", "gtceu:duranium 2592")
         .itemOutputs("gtceu:really_max_battery")
         .EUt(GTValues.VA[GTValues.UHV])
@@ -1351,7 +1351,7 @@ ServerEvents.recipes((event) => {
             .CWUt(288))
 
     gtr.assembly_line("gtceu:transcendent_max_battery")
-        .itemInputs("16x gtceu:double_seaborgium_plate",
+        .itemInputs("16x gtceu:double_quantanium_plate",
             "16x #gtceu:circuits/uiv",
             "gtceu:really_max_battery",
             "8x kubejs:optical_processing_core",
@@ -2069,7 +2069,7 @@ ServerEvents.recipes((event) => {
 
     const parts_materialas = [
         ["uhv", "1", "europium", "abyssalalloy", "uv", "zpm", "400000", "neutronium", "ruthenium_trinium_americium_neutronate", "orichalcum", "2x gtceu:gravi_star", "1", "fluxed_electrum", "gtceu:highurabilityompoundteel 576"],
-        ["uev", "2", "mithril", "titansteel", "uhv", "uv", "1600000", "seaborgium", "enderite", "hastelloyx_78", "4x gtceu:gravi_star", "2", "dalisenite", "gtceu:bohrium 576"]
+        ["uev", "2", "mithril", "titansteel", "uhv", "uv", "1600000", "quantanium", "enderite", "hastelloyx_78", "4x gtceu:gravi_star", "2", "dalisenite", "gtceu:bohrium 576"]
     ]
     parts_materialas.forEach((parts_material) => {
         gtr.assembly_line("gtceu:" + parts_material[0] + "_electric_motor")
@@ -2442,7 +2442,7 @@ ServerEvents.recipes((event) => {
             .CWUt(64))
 
     gtr.assembly_line("gtceu:aggregation_device")
-        .itemInputs("4x kubejs:draconium_block_charged", "64x kubejs:pm_chip", "64x kubejs:pm_chip", "8x kubejs:reinforced_echo_shard", "4x gtceu:enderite_hex_wire", "4x gtceu:uev_field_generator", "gtceu:really_max_battery", "64x gtceu:seaborgium_screw", "8x gtceu:double_dalisenite_plate", "8x gtceu:double_seaborgium_plate")
+        .itemInputs("4x kubejs:draconium_block_charged", "64x kubejs:pm_chip", "64x kubejs:pm_chip", "8x kubejs:reinforced_echo_shard", "4x gtceu:enderite_hex_wire", "4x gtceu:uev_field_generator", "gtceu:really_max_battery", "64x gtceu:quantanium_screw", "8x gtceu:double_dalisenite_plate", "8x gtceu:double_seaborgium_plate")
         .itemOutputs("gtceu:aggregation_device")
         .inputFluids("gtceu:mutated_living_solder 1296", "gtceu:neutronium 576", "gtceu:mana 1000", "gtceu:enriched_dragon_breath 100")
         .EUt(GTValues.VA[GTValues.UEV])
@@ -2498,7 +2498,7 @@ ServerEvents.recipes((event) => {
 
     const wireless_tiers = [
         [0, "uhv", "neutronium", "europium", "kubejs:nm_chip", "8x kubejs:smd_inductor_bioware"],
-        [1, "uev", "seaborgium", "mithril", "kubejs:nm_chip", "8x kubejs:smd_inductor_optical"],
+        [1, "uev", "quantanium", "mithril", "kubejs:nm_chip", "8x kubejs:smd_inductor_optical"],
         [2, "uiv", "adamantium", "neutronium", "kubejs:pm_chip", "8x kubejs:smd_inductor_exotic"],
         [3, "uxv", "vibranium", "taranium", "kubejs:pm_chip", "8x kubejs:smd_inductor_cosmic"],
         [4, "opv", "draconium", "crystalmatrix", "kubejs:fm_chip", "8x kubejs:smd_inductor_supracausal"],
@@ -2670,7 +2670,7 @@ ServerEvents.recipes((event) => {
     }
     const machine_materials = [
         ["uhv", "neutronium", "europium", "abyssalalloy", "uev", "1966080", "uv", "128", "kubejs:smd_diode_bioware"],
-        ["uev", "seaborgium", "mithril", "titansteel", "uiv", "7864320", "uhv", "256", "kubejs:smd_diode_optical"],
+        ["uev", "quantanium", "mithril", "titansteel", "uiv", "7864320", "uhv", "256", "kubejs:smd_diode_optical"],
         ["uiv", "adamantium", "neutronium", "adamantine", "uxv", "31457280", "uev", "512", "kubejs:smd_diode_exotic"],
         ["uxv", "vibranium", "taranium", "naquadriatictaranium", "opv", "125829120", "uiv", "1024", "kubejs:smd_diode_cosmic"],
         ["opv", "draconium", "crystalmatrix", "starmetal", "max", "503316480", "uxv", "2048", "kubejs:smd_diode_supracausal"]
@@ -3428,7 +3428,7 @@ ServerEvents.recipes((event) => {
 
     gtr.precision_assembler("kubejs:infinity_antimatter_fuel_rod")
         .itemInputs("64x kubejs:pellet_antimatter", "64x kubejs:pellet_antimatter", "64x kubejs:pellet_antimatter", "kubejs:annihilation_constrainer")
-        .inputFluids("gtceu:liquid_hydrogen 200000", "gtceu:heavy_quark_degenerate_matter_plasma 1000", "gtceu:cosmic_mesh 100", "gtceu:infinity 100")
+        .inputFluids("gtceu:liquid_hydrogen 200000", "gtceu:heavy_quark_degenerate_matter_plasma 1000", "gtceu:liquid_cosmic_mesh 100", "gtceu:infinity 100")
         .itemOutputs("kubejs:infinity_antimatter_fuel_rod")
         .EUt(GTValues.VA[GTValues.MAX])
         .duration(2000)
@@ -4867,13 +4867,6 @@ ServerEvents.recipes((event) => {
         .EUt(GTValues.VA[GTValues.UXV])
         .duration(200)
 
-    gtr.vacuum_freezer("gtceu:oganesson_ingot")
-        .inputFluids("gtceu:hot_oganesson 1000")
-        .notConsumable("gtceu:ingot_casting_mold")
-        .itemOutputs("gtceu:oganesson_ingot")
-        .EUt(GTValues.VA[GTValues.UV])
-        .duration(280)
-
     //hassium
     gtr.mixer("gtceu:scandium_titanium_50_mixture")
         .inputFluids("gtceu:titanium_50 144", "gtceu:scandium 144")
@@ -5086,13 +5079,13 @@ ServerEvents.recipes((event) => {
         .itemInputs("kubejs:cosmic_mesh_containment_unit")
         .inputFluids("gtceu:liquid_helium 100000")
         .itemOutputs("kubejs:time_dilation_containment_unit")
-        .outputFluids("gtceu:cosmic_mesh 1000")
+        .outputFluids("gtceu:liquid_cosmic_mesh 1000")
         .EUt(GTValues.VA[GTValues.OpV])
         .duration(800)
 
     gtr.sps_crafting("kubejs:cosmic_fabric")
         .notConsumable("gtceu:cosmicneutronium_nanoswarm")
-        .inputFluids("gtceu:mana 1000", "gtceu:enriched_xenoxene 1000", "gtceu:cosmic_mesh 100")
+        .inputFluids("gtceu:mana 1000", "gtceu:enriched_xenoxene 1000", "gtceu:liquid_cosmic_mesh 100")
         .itemInputs("gtceu:rubber_foil", "kubejs:amorphous_matter")
         .itemOutputs("kubejs:cosmic_fabric")
         .EUt(GTValues.VA[GTValues.OpV])
@@ -8184,7 +8177,7 @@ ServerEvents.recipes((event) => {
 
     gtr.plasma_condenser("gtceu:hassium")
         .inputFluids("gtceu:metastable_hassium_plasma 1000", "gtceu:liquid_helium 100000")
-        .outputFluids("gtceu:helium 100000", "gtceu:hassium 1000")
+        .outputFluids("gtceu:helium 100000", "gtceu:metastable_hassium 1000")
         .EUt(GTValues.VA[GTValues.UHV])
         .duration(1200)
 
@@ -8590,7 +8583,7 @@ ServerEvents.recipes((event) => {
         .cleanroom(CleanroomType.CLEANROOM)
 
     gtr.assembler("kubejs:smd_inductor_optical")
-        .itemInputs("8x gtceu:fine_dubnium_wire", "gtceu:seaborgium_ring")
+        .itemInputs("8x gtceu:fine_dubnium_wire", "gtceu:quantanium_ring")
         .inputFluids("gtceu:polyimide 576")
         .itemOutputs("16x kubejs:smd_inductor_optical")
         .EUt(GTValues.VA[GTValues.UHV])
@@ -8653,7 +8646,7 @@ ServerEvents.recipes((event) => {
 
         gtr.circuit_assembly_line("kubejs:optical_mainframe" + circuit_robot)
             .notConsumable("kubejs:precision_circuit_assembly_robot_mk" + circuit_robot)
-            .itemInputs("2x gtceu:seaborgium_frame",
+            .itemInputs("2x gtceu:quantanium_frame",
                 "2x kubejs:optical_computer",
                 "64x kubejs:smd_capacitor_optical",
                 "64x kubejs:smd_diode_optical",
@@ -8740,7 +8733,7 @@ ServerEvents.recipes((event) => {
                 "24x kubejs:exotic_ram_chip",
                 "16x gtceu:polyetheretherketone_foil",
                 "2x gtceu:infuscolium_plate")
-            .inputFluids("gtceu:tritanium 576", "gtceu:zylon 288", "gtceu:naquadria 1296")
+            .inputFluids("gtceu:tritanium 576", "gtceu:zylon 288", "gtceu:quantanium 288", "gtceu:naquadria 1296")
             .itemOutputs("2x kubejs:exotic_assembly")
             .EUt(GTValues.VA[GTValues.ZPM] * (4 ** circuit_robot))
             .duration(400 * 64 / (4 ** circuit_robot))
@@ -8762,7 +8755,7 @@ ServerEvents.recipes((event) => {
                 "32x gtceu:polyetheretherketone_foil",
                 "kubejs:unstable_star",
                 "2x gtceu:adamantine_plate")
-            .inputFluids("gtceu:enderium 576", "gtceu:zylon 576", "gtceu:orichalcum 1296")
+            .inputFluids("gtceu:enderium 576", "gtceu:zylon 576", "gtceu:quantanium 576", "gtceu:orichalcum 1296")
             .itemOutputs("kubejs:exotic_computer")
             .EUt(GTValues.VA[GTValues.ZPM] * (4 ** circuit_robot))
             .duration(400 * 64 / (4 ** circuit_robot))
@@ -8784,7 +8777,7 @@ ServerEvents.recipes((event) => {
                 "2x kubejs:unstable_star",
                 "2x gtceu:black_titanium_plate",
                 "4x gtceu:double_technetium_plate")
-            .inputFluids("gtceu:enderium 1296", "gtceu:zylon 1296", "gtceu:seaborgium 1296")
+            .inputFluids("gtceu:enderium 1296", "gtceu:zylon 1296", "gtceu:quantanium 1296", "gtceu:seaborgium 1296")
             .itemOutputs("kubejs:exotic_mainframe")
             .EUt(GTValues.VA[GTValues.ZPM] * (4 ** circuit_robot))
             .duration(800 * 64 / (4 ** circuit_robot))
@@ -9322,7 +9315,7 @@ ServerEvents.recipes((event) => {
             "4x gtceu:power_thruster",
             "2x gtceu:steel_minecart_wheels",
             "4x gtceu:steel_spring",
-            "8x gtceu:seaborgium_plate")
+            "8x gtceu:quantanium_plate")
         .inputFluids("gtceu:soldering_alloy 2880", "gtceu:yttrium 2880", "gtceu:blue_alloy 2880", "gtceu:rtm_alloy 2880")
         .itemOutputs("kubejs:space_drone_mk3")
         .EUt(GTValues.VA[GTValues.UEV])
@@ -10136,13 +10129,6 @@ ServerEvents.recipes((event) => {
         .CWUt(128)
         .cleanroom(CleanroomType.CLEANROOM)
 
-    gtr.scanner("1x_kubejs_raw_photon_carrying_wafer")
-        .itemInputs("gtceu:data_module", "kubejs:raw_photon_carrying_wafer")
-        .inputFluids("gtceu:pcb_coolant 64000")
-        .itemOutputs(Item.of("gtceu:data_module", "{assembly_line_research:{research_id:\"1x_kubejs_raw_photon_carrying_wafer\",research_type:\"gtceu:dimensional_focus_engraving_array\"}}"))
-        .EUt(GTValues.VA[GTValues.UV])
-        .duration(1200)
-
     gtr.dimensional_focus_engraving_array("kubejs:raw_photon_carrying_wafer")
         .itemInputs("kubejs:rutherfordium_neutronium_wafer")
         .notConsumable("#forge:lenses/yellow")
@@ -10152,17 +10138,10 @@ ServerEvents.recipes((event) => {
         .duration(600)
         .CWUt(1)
         .cleanroom(CleanroomType.CLEANROOM)
-        .stationResearch(b => b.researchStack(Item.of("gtceu:chemical_plant"))
-            .dataStack(Item.of("gtceu:data_module"))
-            .EUt(GTValues.VA[GTValues.UHV])
-            .CWUt(64))
-
-    gtr.scanner("1x_kubejs_prepared_cosmic_soc_wafer")
-        .itemInputs("gtceu:data_module", "kubejs:prepared_cosmic_soc_wafer")
-        .inputFluids("gtceu:pcb_coolant 64000")
-        .itemOutputs(Item.of("gtceu:data_module", "{assembly_line_research:{research_id:\"1x_kubejs_prepared_cosmic_soc_wafer\",research_type:\"gtceu:dimensional_focus_engraving_array\"}}"))
-        .EUt(GTValues.VA[GTValues.UEV])
-        .duration(1200)
+    ["scannerResearch(java.util.function.UnaryOperator)"](b => b.researchStack(Item.of("kubejs:raw_photon_carrying_wafer"))
+        .dataStack(Item.of("gtceu:data_module"))
+        .EUt(GTValues.VA[GTValues.UHV])
+        .duration(2400))
 
     gtr.dimensional_focus_engraving_array("kubejs:prepared_cosmic_soc_wafer")
         .itemInputs("kubejs:taranium_wafer")
@@ -10173,17 +10152,10 @@ ServerEvents.recipes((event) => {
         .duration(4800)
         .CWUt(8)
         .cleanroom(CleanroomType.CLEANROOM)
-        .stationResearch(b => b.researchStack(Item.of("gtceu:chemical_plant"))
-            .dataStack(Item.of("gtceu:data_module"))
-            .EUt(GTValues.VA[GTValues.UIV])
-            .CWUt(64))
-
-    gtr.scanner("1x_kubejs_high_precision_crystal_soc")
-        .itemInputs("gtceu:data_module", "kubejs:high_precision_crystal_soc")
-        .inputFluids("gtceu:pcb_coolant 64000")
-        .itemOutputs(Item.of("gtceu:data_module", "{assembly_line_research:{research_id:\"1x_kubejs_high_precision_crystal_soc\",research_type:\"gtceu:dimensional_focus_engraving_array\"}}"))
-        .EUt(GTValues.VA[GTValues.UHV])
-        .duration(1200)
+    ["scannerResearch(java.util.function.UnaryOperator)"](b => b.researchStack(Item.of("kubejs:prepared_cosmic_soc_wafer"))
+        .dataStack(Item.of("gtceu:data_module"))
+        .EUt(GTValues.VA[GTValues.UIV])
+        .duration(2400))
 
     gtr.dimensional_focus_engraving_array("kubejs:high_precision_crystal_soc")
         .itemInputs("gtceu:crystal_soc")
@@ -10194,17 +10166,10 @@ ServerEvents.recipes((event) => {
         .duration(2400)
         .CWUt(2)
         .cleanroom(CleanroomType.CLEANROOM)
-        .stationResearch(b => b.researchStack(Item.of("gtceu:chemical_plant"))
-            .dataStack(Item.of("gtceu:data_module"))
-            .EUt(GTValues.VA[GTValues.UEV])
-            .CWUt(64))
-
-    gtr.scanner("1x_kubejs_nm_wafer")
-        .itemInputs("gtceu:data_module", "kubejs:nm_wafer")
-        .inputFluids("gtceu:pcb_coolant 64000")
-        .itemOutputs(Item.of("gtceu:data_module", "{assembly_line_research:{research_id:\"1x_kubejs_nm_wafer\",research_type:\"gtceu:dimensional_focus_engraving_array\"}}"))
-        .EUt(GTValues.VA[GTValues.ZPM])
-        .duration(1200)
+    ["scannerResearch(java.util.function.UnaryOperator)"](b => b.researchStack(Item.of("kubejs:high_precision_crystal_soc"))
+        .dataStack(Item.of("gtceu:data_module"))
+        .EUt(GTValues.VA[GTValues.UEV])
+        .duration(2400))
 
     gtr.dimensional_focus_engraving_array("kubejs:nm_wafer")
         .itemInputs("kubejs:rutherfordium_neutronium_wafer")
@@ -10215,38 +10180,24 @@ ServerEvents.recipes((event) => {
         .duration(900)
         .CWUt(1)
         .cleanroom(CleanroomType.CLEANROOM)
-        .stationResearch(b => b.researchStack(Item.of("gtceu:chemical_plant"))
-            .dataStack(Item.of("gtceu:data_module"))
-            .EUt(GTValues.VA[GTValues.UV])
-            .CWUt(64))
-
-    gtr.scanner("1x_kubejs_pm_wafer")
-        .itemInputs("gtceu:data_module", "kubejs:pm_wafer")
-        .inputFluids("gtceu:pcb_coolant 64000")
-        .itemOutputs(Item.of("gtceu:data_module", "{assembly_line_research:{research_id:\"1x_kubejs_pm_wafer\",research_type:\"gtceu:dimensional_focus_engraving_array\"}}"))
-        .EUt(GTValues.VA[GTValues.ZPM])
-        .duration(1200)
+    ["scannerResearch(java.util.function.UnaryOperator)"](b => b.researchStack(Item.of("kubejs:nm_wafer"))
+        .dataStack(Item.of("gtceu:data_module"))
+        .EUt(GTValues.VA[GTValues.UV])
+        .duration(2400))
 
     gtr.dimensional_focus_engraving_array("kubejs:pm_wafer")
         .itemInputs("kubejs:taranium_wafer")
         .notConsumable("#forge:lenses/magenta")
         .inputFluids("gtceu:euv_photoresist 100")
         .itemOutputs("kubejs:pm_wafer")
-        .EUt(GTValues.VA[GTValues.UV])
+        .EUt(GTValues.VA[GTValues.UHV])
         .duration(1800)
         .CWUt(2)
         .cleanroom(CleanroomType.CLEANROOM)
-        .stationResearch(b => b.researchStack(Item.of("gtceu:chemical_plant"))
-            .dataStack(Item.of("gtceu:data_module"))
-            .EUt(GTValues.VA[GTValues.UV])
-            .CWUt(64))
-
-    gtr.scanner("1x_kubejs_fm_wafer")
-        .itemInputs("gtceu:data_module", "kubejs:fm_wafer")
-        .inputFluids("gtceu:pcb_coolant 64000")
-        .itemOutputs(Item.of("gtceu:data_module", "{assembly_line_research:{research_id:\"1x_kubejs_fm_wafer\",research_type:\"gtceu:dimensional_focus_engraving_array\"}}"))
+    ["scannerResearch(java.util.function.UnaryOperator)"](b => b.researchStack(Item.of("kubejs:pm_wafer"))
+        .dataStack(Item.of("gtceu:data_module"))
         .EUt(GTValues.VA[GTValues.UHV])
-        .duration(1200)
+        .duration(2400))
 
     gtr.dimensional_focus_engraving_array("kubejs:fm_wafer")
         .itemInputs("kubejs:pm_wafer")
@@ -10257,10 +10208,10 @@ ServerEvents.recipes((event) => {
         .duration(2700)
         .CWUt(4)
         .cleanroom(CleanroomType.CLEANROOM)
-        .stationResearch(b => b.researchStack(Item.of("gtceu:chemical_plant"))
-            .dataStack(Item.of("gtceu:data_module"))
-            .EUt(GTValues.VA[GTValues.UEV])
-            .CWUt(64))
+    ["scannerResearch(java.util.function.UnaryOperator)"](b => b.researchStack(Item.of("kubejs:fm_wafer"))
+        .dataStack(Item.of("gtceu:data_module"))
+        .EUt(GTValues.VA[GTValues.UEV])
+        .duration(2400))
 
     gtr.chemical_bath("kubejs:cosmic_soc_wafer")
         .itemInputs("kubejs:prepared_cosmic_soc_wafer")
@@ -11535,7 +11486,7 @@ ServerEvents.recipes((event) => {
             "6x kubejs:topological_manipulator_unit",
             "gtceu:max_field_generator",
             "4x gtceu:double_eternity_plate")
-        .inputFluids("gtceu:infinity 576", "gtceu:super_mutated_living_solder 1000", "gtceu:cosmic_mesh 1000", "gtceu:spatialfluid 2000")
+        .inputFluids("gtceu:infinity 576", "gtceu:super_mutated_living_solder 1000", "gtceu:liquid_cosmic_mesh 1000", "gtceu:spatialfluid 2000")
         .itemOutputs("kubejs:dimension_creation_casing")
         .EUt(GTValues.VA[GTValues.MAX])
         .duration(1200)
@@ -11557,7 +11508,7 @@ ServerEvents.recipes((event) => {
             "16x gtceu:max_robot_arm",
             "gtceu:mega_max_battery",
             "64x gtceu:double_cosmic_plate")
-        .inputFluids("gtceu:super_mutated_living_solder 288000", "gtceu:infinity 100000", "gtceu:cosmic_mesh 100000", "gtceu:spacetime 100000")
+        .inputFluids("gtceu:super_mutated_living_solder 288000", "gtceu:infinity 100000", "gtceu:liquid_cosmic_mesh 100000", "gtceu:spacetime 100000")
         .itemOutputs("gtceu:door_of_create")
         .EUt(4 * GTValues.VA[GTValues.MAX])
         .duration(2400)
@@ -12080,10 +12031,10 @@ ServerEvents.recipes((event) => {
     gtr.ultimate_material_forge("kubejs:proto_matter")
         .itemInputs("kubejs:triplet_neutronium_sphere")
         .inputFluids("gtceu:uu_matter 1000")
-        .itemOutputs("gtceu:neutronium_ingot")
-        .chancedOutput("kubejs:proto_matter", 6000, 0)
+        .itemOutputs("kubejs:proto_matter")
+        .chancedOutput("gtceu:neutronium_ingot", 6000, 0)
         .EUt(GTValues.VA[GTValues.OpV])
-        .duration(1200)
+        .duration(1600)
 
     function implosion_compressor_add(input, output, am) {
         gtr.implosion_compressor(output + "_powderbarrel")
@@ -13223,7 +13174,7 @@ ServerEvents.recipes((event) => {
             .CWUt(256))
 
     gtr.assembly_line("gtceu:dimensional_focus_engraving_array")
-        .itemInputs("8x gtceu:uhv_laser_engraver", "16x gtceu:neutronium_nanoswarm", "64x gtceu:normal_laser_pipe", "8x gtceu:uev_field_generator", "4x gtceu:uev_emitter", "16x #gtceu:circuits/uiv", "16x gtceu:seaborgium_rod", "32x gtceu:double_dubnium_plate")
+        .itemInputs("8x gtceu:uhv_laser_engraver", "16x gtceu:neutronium_nanoswarm", "64x gtceu:normal_laser_pipe", "8x gtceu:uev_field_generator", "4x gtceu:uev_emitter", "16x #gtceu:circuits/uiv", "16x gtceu:quantanium_rod", "32x gtceu:double_dubnium_plate")
         .inputFluids("gtceu:mutated_living_solder 28800", "gtceu:polyetheretherketone 28800", "gtceu:pikyonium 4608", "gtceu:abyssalalloy 4608")
         .itemOutputs("gtceu:dimensional_focus_engraving_array")
         .EUt(GTValues.VA[GTValues.UEV])
@@ -13406,7 +13357,7 @@ ServerEvents.recipes((event) => {
         .notConsumable("gtceu:black_glass_lens")
         .itemInputs("8x gtceu:cosmicneutronium_block", "32x kubejs:optical_soc", "32x kubejs:exotic_wafer", "16x kubejs:cosmic_ram_wafer", "8x kubejs:cosmic_processing_unit_core")
         .itemOutputs("gtceu:cosmicneutronium_nanoswarm")
-        .inputFluids("gtceu:uu_matter 40000", "gtceu:crystalmatrix 40000", "gtceu:cosmic_mesh 40000")
+        .inputFluids("gtceu:uu_matter 40000", "gtceu:crystalmatrix 40000", "gtceu:liquid_cosmic_mesh 40000")
         .duration(40000)
         .EUt(GTValues.VA[GTValues.UXV])
     ["addData(java.lang.String,int)"]("nano_forge_tier", 3)
@@ -13844,13 +13795,6 @@ ServerEvents.recipes((event) => {
         .EUt(GTValues.VA[GTValues.MAX])
         .duration(200)
 
-    gtr.macerator("kubejs:draconium_dust_a")
-        .itemInputs("minecraft:dragon_egg")
-        .itemOutputs("4x gtceu:ender_pearl_dust")
-        .chancedOutput("kubejs:draconium_dust", 6000, 500)
-        .EUt(GTValues.VA[GTValues.UEV])
-        .duration(8000)
-
     gtr.packer("gtceu:tiny_degenerate_rhenium_dust")
         .itemInputs("gtceu:degenerate_rhenium_dust")
         .itemOutputs("9x gtceu:tiny_degenerate_rhenium_dust")
@@ -14040,5 +13984,50 @@ ServerEvents.recipes((event) => {
         .inputFluids("gtceu:naquadah 1440")
         .itemOutputs("gtceu:disassembly")
         .EUt(7680)
+        .duration(800)
+
+    gtr.vacuum_freezer("gtceu:metastable_oganesson")
+        .inputFluids("gtceu:hot_oganesson 1000", "kubejs:gelid_cryotheum 144")
+        .outputFluids("gtceu:metastable_oganesson 144")
+        .itemOutputs("2x gtceu:small_enderium_dust")
+        .EUt(GTValues.VA[GTValues.UV])
+        .duration(280)
+
+    gtr.neutron_activator("gtceu:hassium")
+        .inputFluids("gtceu:liquid_metastable_hassium 1000")
+        .outputFluids("gtceu:hassium 1000")
+    ["addData(java.lang.String,int)"]("ev_min", 340)
+    ["addData(java.lang.String,int)"]("ev_max", 380)
+    ["addData(java.lang.String,int)"]("evt", 480)
+        .duration(200)
+        .cleanroom(CleanroomType.CLEANROOM)
+
+    gtr.neutron_activator("gtceu:oganesson")
+        .inputFluids("gtceu:metastable_oganesson 1000")
+        .outputFluids("gtceu:oganesson 1000")
+    ["addData(java.lang.String,int)"]("ev_min", 720)
+    ["addData(java.lang.String,int)"]("ev_max", 800)
+    ["addData(java.lang.String,int)"]("evt", 1200)
+        .duration(200)
+        .cleanroom(CleanroomType.CLEANROOM)
+
+    gtr.neutron_activator("gtceu:quantanium")
+        .inputFluids("gtceu:neon 10000")
+        .itemInputs("4x gtceu:quantum_star", "8x gtceu:quantum_eye", "16x gtceu:mithril_dust", "16x gtceu:gadolinium_dust", "64x minecraft:netherite_scrap", "64x ae2:fluix_dust")
+        .outputFluids("gtceu:quantanium 10000")
+    ["addData(java.lang.String,int)"]("ev_min", 1020)
+    ["addData(java.lang.String,int)"]("ev_max", 1200)
+    ["addData(java.lang.String,int)"]("evt", 3840)
+        .duration(1200)
+
+    gtr.neutron_activator("kubejs:draconium_dust")
+        .inputFluids("gtceu:uu_amplifier 1000")
+        .notConsumable("gtceu:degenerate_rhenium_plate")
+        .itemInputs("minecraft:dragon_egg")
+        .itemOutputs("8x gtceu:ender_eye_dust", "4x gtceu:ender_pearl_dust")
+        .chancedOutput("kubejs:draconium_dust", 4000, 0)
+    ["addData(java.lang.String,int)"]("ev_min", 800)
+    ["addData(java.lang.String,int)"]("ev_max", 900)
+    ["addData(java.lang.String,int)"]("evt", 5760)
         .duration(800)
 })
