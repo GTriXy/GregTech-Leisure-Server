@@ -37,7 +37,7 @@ ItemEvents.tooltip(event => {
     event.add("gtceu:large_recycler", "电压等级每高出EV1级，最大并行数x4")
     event.add("gtceu:void_fluid_drilling_rig", "读取数据钻取虚空的流体")
     event.add("gtceu:large_void_miner", ["精准模式消耗精华采集指定矿脉", "随机模式消耗10KB的钻井液和更长的耗时随机采集所有矿石", "随机模式注意输出空间要足够，推荐使用ME输出总成"])
-    event.add("gtceu:stellar_forge", ["每4倍功率提升3倍速度", "利用爆弹在瞬间产生的巨大能量来熔合物质", "§7在运行时供能不足可能导致星球毁灭"])
+    event.add("gtceu:stellar_forge", ["利用爆弹在瞬间产生的巨大能量来熔合物质", "§7在运行时供能不足可能导致星球毁灭"])
     event.add("gtceu:large_rock_crusher", "需要在输入仓中放入对应流体")
     event.add("gtceu:plasma_condenser", "等离子专用冷冻机")
     event.add("gtceu:rare_earth_centrifugal", "稀土专用离心机")
@@ -64,9 +64,9 @@ ItemEvents.tooltip(event => {
     event.add("gtceu:dimensionally_transcendent_mixer", "运行搅拌机配方时每秒进度额外增加1秒")
     event.add("gtceu:pcb_factory", ["放入纳米蜂群可获得减免", "可使用金和振金，每个提升1%速度", "振金还可使能耗降低4倍"])
     event.add("gtceu:space_probe_surface_reception", "不要遮挡")
-    event.add(["gtceu:mega_alloy_blast_smelter", "gtceu:mega_blast_furnace"], "耗时倍数x0.8")
+    event.add(["gtceu:mega_alloy_blast_smelter","gtceu:large_rock_crusher"], ["耗能倍数x0.8","耗时倍数x0.6"])
     event.add("gtceu:super_blast_smelter", "耗时倍数x0.2")
-    event.add("gtceu:dyson_sphere", ["发射戴森球模块后开始工作", "每次运行都有(模块数量/128 + 1)%的概率损坏一次模块", "当损坏高于60%时，输出效率降低为(100-损坏值)%", "当损坏达到100%时减少一次模块发射数量", "在损坏值高于70%时发射不会增加发射次数，但会将损坏值清零", "产能功率由发射的模块数量决定", "每次发射可使功率增加1A MAX"])
+    event.add("gtceu:dyson_sphere", ["发射戴森球模块后开始工作", "每次运行都有(模块数量/128 + 1)%的概率损坏一次模块", "当损坏高于60%时，输出效率随损坏值由100%逐渐降低到20%，并输出随损坏值增强的红石信号", "当损坏达到100%时减少一次模块发射数量，并重制损坏值", "在损坏值高于60%时发射不会增加发射次数，但会重制损坏值", "产能功率，和需求算力由发射的模块数量决定", "每次发射可使功率增加1A MAX"])
     event.add("gtceu:bedrock_drilling_rig", ["需要基岩在钻头下方", "每次运行都有10%的概率破坏基岩"])
     event.add("gtceu:super_computation", ["根据不同的电压等级获得算力输出", "且每种算力输出需要不同的电路主机8个", "提供UIV级电压时，需要放入光学处理器主机，并提供1024CWU/t", "提供UXV级电压时，需要放入奇异处理器主机，并提供2048CWU/t", "提供OpV级电压时，需要放入寰宇处理器主机，并提供4096CWU/t", "提供MAX级电压时，需要放入超因果处理器主机，并提供8192CWU/t"])
     event.add("gtceu:blaze_blast_furnace", ["需每秒提供§b10x(功率÷120)^1/2§r的§e液态烈焰§r", "耗时倍数x0.5", "最大并行数固定为4"])
@@ -79,6 +79,7 @@ ItemEvents.tooltip(event => {
         "gtceu:naquadah_reactor",
         "gtceu:hyper_reactor",
         "gtceu:advanced_hyper_reactor",
+        "gtceu:element_copying",
         "gtceu:mage_assembler",
         "gtceu:suprachronal_assembly_line",
         "gtceu:superconducting_electromagnetism",
@@ -90,6 +91,7 @@ ItemEvents.tooltip(event => {
         "gtceu:mega_presser",
         "gtceu:mega_wiremill",
         "gtceu:mega_extractor",
+        "gtceu:mega_canner",
         "gtceu:holy_separator",
         "gtceu:crystalline_infinity",
         "gtceu:a_mass_fabricator",
@@ -97,13 +99,17 @@ ItemEvents.tooltip(event => {
         "gtceu:cooling_tower",
         "gtceu:super_blast_smelter",
         "gtceu:super_particle_collider",
-        "gtceu:large_chemical_plant"], "允许同时使用激光仓")
+        "gtceu:large_chemical_plant",
+        "gtceu:star_ultimate_material_forge_factory"], "允许同时使用激光仓")
     event.add(["gtceu:magic_manufacturer",
         "gtceu:sps_crafting",
+        "gtceu:plasma_condenser",
         "gtceu:chemical_plant",
         "gtceu:circuit_printer",
+        "gtceu:crystalline_infinity",
         "gtceu:large_chemical_reactor",
         "gtceu:space_probe_surface_reception",
+        "gtceu:superconducting_electromagnetism",
         "gtceu:dimensionally_transcendent_plasma_forge",
         "gtceu:dimensional_focus_engraving_array",
         "gtceu:advanced_sps_crafting",
@@ -124,21 +130,25 @@ ItemEvents.tooltip(event => {
         "gtceu:mega_wiremill",
         "gtceu:holy_separator",
         "gtceu:mega_extractor",
+        "gtceu:mega_canner",
+        "gtceu:stellar_forge",
         "gtceu:mass_fabricator",
         "gtceu:a_mass_fabricator",
         "gtceu:star_ultimate_material_forge_factory",
         "gtceu:dragon_egg_copier",
         "gtceu:cooling_tower",
         "gtceu:large_chemical_plant"], Text.keybind("gtceu.machine.perfect_oc"))
-    event.add(["gtceu:plasma_condenser",
-        "gtceu:rare_earth_centrifugal",
+    event.add(["gtceu:rare_earth_centrifugal",
         "gtceu:chemical_plant",
         "gtceu:matter_fabricator",
         "gtceu:advanced_assembly_line",
         "gtceu:mass_fabricator",
+        "gtceu:element_copying",
         "gtceu:holy_separator",
+        "gtceu:mega_canner",
         "gtceu:a_mass_fabricator",
         "gtceu:crystalline_infinity",
+        "gtceu:dragon_egg_copier",
         "gtceu:superconducting_electromagnetism",
         "gtceu:suprachronal_assembly_line",
         "gtceu:dimensionally_transcendent_plasma_forge",
@@ -157,6 +167,7 @@ ItemEvents.tooltip(event => {
         "gtceu:large_pyrolyse_oven",
         "gtceu:large_chemical_plant",
         "gtceu:large_incubator",
+        "gtceu:large_rock_crusher",
         "gtceu:large_greenhouse",
         "gtceu:cooling_tower",
         "gtceu:large_cracker",

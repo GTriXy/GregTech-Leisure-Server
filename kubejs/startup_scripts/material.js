@@ -88,10 +88,12 @@ GTCEuStartupEvents.registry("gtceu:material", event => {
 
     //element
     GTMaterials.Mendelevium.setProperty(PropertyKey.WIRE, new $WireProperties(GTValues.V[GTValues.UHV], 4, 16))
-    GTMaterials.Neutronium.addFlags(GENERATE_NANOSWARM, GTMaterialFlags.GENERATE_ROTOR, GTMaterialFlags.GENERATE_SPRING, GTMaterialFlags.GENERATE_GEAR, GTMaterialFlags.GENERATE_SPRING_SMALL)
+    GTMaterials.Neutronium.addFlags(GENERATE_NANOSWARM, GTMaterialFlags.GENERATE_ROTOR, GTMaterialFlags.GENERATE_SPRING, GTMaterialFlags.GENERATE_GEAR, GTMaterialFlags.GENERATE_SMALL_GEAR, GTMaterialFlags.GENERATE_SPRING_SMALL)
     GTMaterials.Neutronium.setProperty(PropertyKey.WIRE, new $WireProperties(GTValues.V[GTValues.UIV], 2, 64))
     GTMaterials.Carbon.setProperty(PropertyKey.INGOT, new $IngotProperty())
+    GTMaterials.RadAway.addFlags(GTMaterialFlags.DISABLE_DECOMPOSITION)
     GTMaterials.Platinum.addFlags(GTMaterialFlags.GENERATE_SPRING, GTMaterialFlags.GENERATE_SPRING_SMALL)
+    GTMaterials.Chromium.addFlags(GTMaterialFlags.GENERATE_GEAR)
     GTMaterials.Carbon.addFlags(GENERATE_NANOSWARM)
     GTMaterials.Iron.addFlags(GENERATE_NANOSWARM)
     GTMaterials.Glowstone.addFlags(GENERATE_NANOSWARM)
@@ -223,6 +225,7 @@ GTCEuStartupEvents.registry("gtceu:material", event => {
     GTMaterials.Indium.getProperty(PropertyKey.ORE).setOreByProducts([GTMaterials.Aluminium, GTMaterials.Zinc])
     GTMaterials.NaquadahEnriched.setProperty(PropertyKey.ORE, new $OreProperty())
     GTMaterials.NaquadahEnriched.getProperty(PropertyKey.ORE).setOreByProducts([GTMaterials.Naquadah, GTMaterials.Sulfur])
+    GTMaterials.Echo.setProperty(PropertyKey.FLUID, new $FluidProperty(GTFluidStorageKeys.LIQUID, new GTFluidBuilder()))
 
     event.create("barnarda_air")
         .gas()
@@ -400,7 +403,7 @@ GTCEuStartupEvents.registry("gtceu:material", event => {
         .element(GTElements.get("quantanium"))
         .color(0x0dff02)
         .iconSet(GTMaterialIconSet.METALLIC)
-        .flags(GTMaterialFlags.GENERATE_ROTOR, GTMaterialFlags.GENERATE_FRAME)
+        .flags(GTMaterialFlags.GENERATE_ROTOR, GTMaterialFlags.GENERATE_SMALL_GEAR, GTMaterialFlags.GENERATE_FRAME)
 
     event.create("vibranium")
         .ingot()
@@ -684,7 +687,7 @@ GTCEuStartupEvents.registry("gtceu:material", event => {
         .fluid()
         .element(GTElements.get("transcendentmetal"))
         .color(0xffffff)
-        .iconSet(Java.loadClass("com.epimorphismmc.monomorphism.data.chemical.material.info.MOMaterialIconSet").CUSTOM_TRANSCENDENT_MENTAL)
+        .iconSet(GTMaterialIconSet.METALLIC)
         .flags(GENERATE_NANOSWARM, GTMaterialFlags.GENERATE_ROUND, GTMaterialFlags.GENERATE_ROTOR, GTMaterialFlags.GENERATE_GEAR, GTMaterialFlags.GENERATE_SMALL_GEAR, GTMaterialFlags.GENERATE_LONG_ROD)
 
     event.create("uruium")
@@ -858,7 +861,7 @@ GTCEuStartupEvents.registry("gtceu:material", event => {
         .components("4x iron", "1x kanthal", "5x invar", "1x sulfur", "1x silicon", "1x carbon")
         .color(0x4e270b)
         .iconSet(GTMaterialIconSet.METALLIC)
-        .flags(GTMaterialFlags.GENERATE_PLATE, GTMaterialFlags.DECOMPOSITION_BY_CENTRIFUGING)
+        .flags(GTMaterialFlags.GENERATE_PLATE, GTMaterialFlags.GENERATE_GEAR, GTMaterialFlags.DECOMPOSITION_BY_CENTRIFUGING)
 
     event.create("inconel_792")
         .ingot()
@@ -867,7 +870,7 @@ GTCEuStartupEvents.registry("gtceu:material", event => {
         .components("2x nickel", "1x niobium", "2x aluminium", "1x nichrome")
         .color(0x44974a)
         .iconSet(GTMaterialIconSet.METALLIC)
-        .flags(GTMaterialFlags.GENERATE_BOLT_SCREW, GTMaterialFlags.GENERATE_FRAME, GTMaterialFlags.DISABLE_DECOMPOSITION)
+        .flags(GTMaterialFlags.GENERATE_BOLT_SCREW, GTMaterialFlags.GENERATE_FRAME, GTMaterialFlags.GENERATE_GEAR, GTMaterialFlags.DISABLE_DECOMPOSITION)
 
     event.create("pikyonium")
         .ingot()
@@ -1029,6 +1032,15 @@ GTCEuStartupEvents.registry("gtceu:material", event => {
         .color(0xd2bfaa)
         .iconSet(GTMaterialIconSet.METALLIC)
         .flags(GTMaterialFlags.GENERATE_PLATE)
+
+    event.create("mar_m_200_steel")
+        .ingot()
+        .fluid()
+        .blastTemp(4600, "high", GTValues.VA[GTValues.IV], 100)
+        .components("2x niobium", "9x chromium", "5x aluminium", "2x titanium", "10x cobalt", "13x tungsten", "18x nickel")
+        .color(0x515151)
+        .iconSet(GTMaterialIconSet.METALLIC)
+        .flags(GTMaterialFlags.GENERATE_GEAR, GTMaterialFlags.DISABLE_DECOMPOSITION)
 
     event.create("lanthanoids_1")
         .dust()
@@ -1278,14 +1290,6 @@ GTCEuStartupEvents.registry("gtceu:material", event => {
     event.create("compressed_stone")
         .dust()
         .color(0x696969)
-        .components("1x concrete")
-        .iconSet(GTMaterialIconSet.DULL)
-        .flags(GTMaterialFlags.DISABLE_DECOMPOSITION)
-
-    event.create("echo")
-        .dust()
-        .fluid()
-        .color(0x004d39)
         .components("1x concrete")
         .iconSet(GTMaterialIconSet.DULL)
         .flags(GTMaterialFlags.DISABLE_DECOMPOSITION)
@@ -3533,4 +3537,6 @@ GTCEuStartupEvents.materialModification(() => {
     GTMaterials.get("er_lu_oxides_solution").setFormula("(Er2O3)(Tm2O3)(Yb2O3)(Lu2O3)")
     GTMaterials.get("earth_crystal").getProperty(PropertyKey.ORE).setOreByProducts(GTMaterials.get("perditio_crystal"))
     GTMaterials.get("ignis_crystal").getProperty(PropertyKey.ORE).setOreByProducts(GTMaterials.get("perditio_crystal"))
+    GTMaterials.PotassiumSulfate.setComponents("2x potassium", "1x sulfur", "4x oxygen")
+    GTMaterials.AmmoniumChloride.setComponents("1x nitrogen", "4x hydrogen", "1x chlorine")
 })
