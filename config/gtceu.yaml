@@ -258,10 +258,10 @@ machines:
   # Default: false
   orderedAssemblyLineFluids: false
 
-  # Let Buffer has more ability.
-  # When enabled it, Buffer will can used to assemble line and so on.
+  # Let Dual Hatch has more ability.
+  # When enabled it, Dual Hatch will can used to assemble line and so on.
   # Need restart Minecraft to apply.
-  enableMoreBufferAbility: false
+  enableMoreDualHatchAbility: false
 
   # Small Steam Boiler Options
   smallBoilers:
@@ -326,6 +326,8 @@ machines:
     # The heat speed of the Large Tungstensteel Boiler.
     # Default: 2
     tungstensteelBoilerHeatSpeed: 16
+
+  enablePrimitiveVoidOre: false
 
 client:
   # Whether or not to enable Emissive Textures for GregTech Machines.
