@@ -19,7 +19,6 @@ ItemEvents.tooltip(event => {
     event.add("gtceu:star_ultimate_material_forge_factory", "最大并行数：1000")
     event.add("gtceu:create_computation", "需要输入MAX级电压")
     event.add("gtceu:slaughterhouse", ["电动刷怪塔，自动杀怪", "电压等级每高出MV1级，每次处理次数+8", "1号电路为非敌对生物，2号为敌对生物", "实体生成模式为玩家击杀的实际掉落，需要非和平模式", "非实体生成模式为虚拟掉落，可以和平模式，由玩家击杀的掉落物无法获取", "注意机器内部除玩家外任何实体都会被攻击"])
-    event.add("gtceu:aggregation_device", "启动耗能为4800MEU")
     event.add("gtceu:dimensionally_transcendent_steam_boiler", ["最大蒸汽产出：4096000mB/t", "需要连续运行1个小时才能达到最大输出"])
     event.add("kubejs:essence_block", "将骨块放置在转换室获得")
     event.add("kubejs:draconium_block_charged", "将注入龙力的黑曜石放置在转换室获得")
@@ -46,6 +45,7 @@ ItemEvents.tooltip(event => {
     event.add(["gtceu:dimensional_focus_engraving_array", "gtceu:mega_wiremill", "gtceu:mega_presser", "gtceu:mega_extractor"], "线圈温度每高出900K，并行数x2")
     event.add("gtceu:sps_crafting", "借助魔力合成特殊的物品")
     event.add("gtceu:matter_fabricator", "产出特殊物质")
+    event.add("gtceu:engraving_laser_plant", "精密激光模式不支持并行")
     event.add(["gtceu:nano_forge_1", "gtceu:nano_forge_2", "gtceu:nano_forge_3"], ["只能使用激光仓", "放入对应的纳米蜂群才能工作，并且按蜂群数量来并行"])
     event.add("gtceu:nano_forge_1", ["并行数为蜂群数量"])
     event.add("gtceu:nano_forge_2", ["处理2阶配方时，并行数为蜂群数量", "处理1阶配方时并行数量翻倍，超频模式改为无损超频"])
@@ -61,7 +61,7 @@ ItemEvents.tooltip(event => {
     event.add("gtceu:hyper_reactor", ["每次运行前提供额外的1mb等离子体将获得16的并行", "不同燃料所需的等离子体不同", "从1-4顺序为：", "山铜，末影，魔金，亚稳态𬭶"])
     event.add("gtceu:advanced_hyper_reactor", ["提供不同等离子体获得不同并行", "星辉：8，致密中子：16"])
     event.add("gtceu:a_mass_fabricator", ["耗能倍数x0.8", "耗时倍数x0.5"])
-    event.add("gtceu:dimensionally_transcendent_mixer", "运行搅拌机配方时每秒进度额外增加1秒")
+    event.add("gtceu:dimensionally_transcendent_mixer", "运行搅拌机配方时时间减少为0.2倍")
     event.add("gtceu:pcb_factory", ["放入纳米蜂群可获得减免", "可使用金和振金，每个提升1%速度", "振金还可使能耗降低4倍"])
     event.add("gtceu:space_probe_surface_reception", "不要遮挡")
     event.add(["gtceu:mega_alloy_blast_smelter", "gtceu:large_rock_crusher"], ["耗能倍数x0.8", "耗时倍数x0.6"])
@@ -74,7 +74,7 @@ ItemEvents.tooltip(event => {
     event.add("gtceu:annihilate_generator", ["终极质能转换"])
     event.add("gtceu:sphere_of_harmony", ["创造一个微缩宇宙，并获取里面的资源", "这台多方块机器需要太多EU，无法用常规手段供能", "由无线EU网络直接供给EU，具体数值可在GUI内查看", "工作前需设置好电路", "执行特殊超频模式，每提升16倍功率提升2倍速度，超频由编程电路调节", "1号不执行超频，2-4分别执行1，2，3次超频", "启动需1024B的宇宙素，与1024KB的氢和氦", "氢和氦存储在机器内部，在机器准备工作之前会持续消耗"])
     event.add("gtceu:integrated_ore_processor", ["一步完成矿石处理", "1号电路为研磨-研磨-离心", "2号电路为研磨-洗矿-热离-研磨", "3号电路为研磨-洗矿-研磨-离心", "4号电路为研磨-洗矿-筛选-离心", "5号电路为研磨-浸洗-热离-研磨", "6号电路为研磨-浸洗-研磨-离心", "7号电路为研磨-浸洗-筛选-离心"])
-    event.add("gtceu:fission_reactor", ["反应堆在运行前会获得最大并行数量为燃料组件数量的并行", "反应堆在运行过程中会根据配方产热","如果温度高于1500K，反应堆将会损坏，损坏达到100%后反应堆爆炸", "在运行过程中提供冷却液并根据不同冷却液的冷却液系数来控制温度", "冷却液系数：蒸馏水：200，钠钾合金：20", "反应堆冷却有如下参数：", "最低冷却液需求量和最高冷却液供给量", "最低需求量=配方产热x实际并行数量x当前温度/1500", "最高供给量=冷却组件x8", "当供给量>=需求量时达到消耗冷却液条件，消耗提供的冷却液，消耗量为需求量x冷却液系数，并阻止反应堆升温", "如果供给量是需求量的n倍，则执行特殊超频，超频次数为n", "再次消耗需求量的冷却液，并减少1秒时间，如果无法供给冷却液则中断超频，如果进度到达100%则中断超频并消耗一次需求量的冷却液使温度降低1K", "由蒸馏水作为冷却液时将产生蒸汽，产生量：消耗量xmin(160,160/(1.4^(373-温度)))", "由钾钠合金作为冷却液时产生热钾钠合金，产生量=消耗量，如果温度高于825K则产生同等量的超临界钠钾合金", "无论反应堆是否具有消耗冷却液的条件都能执行配方","反应堆停止工作后温度将每秒降低1K"])
+    event.add("gtceu:fission_reactor", ["反应堆在运行前会获得最大并行数量为燃料组件数量的并行", "反应堆在运行过程中会根据配方产热","如果温度高于1500K，反应堆将会损坏，损坏达到100%后反应堆爆炸", "在运行过程中提供冷却液并根据不同冷却液的冷却液系数来控制温度", "冷却液系数：蒸馏水：800，钠钾合金：20", "反应堆冷却有如下参数：", "最低冷却液需求量和最高冷却液供给量", "最低需求量=配方产热x实际并行数量x当前温度/1500", "最高供给量=冷却组件x8", "当供给量>=需求量时达到消耗冷却液条件，消耗提供的冷却液，消耗量为需求量x冷却液系数，并阻止反应堆升温", "如果供给量是需求量的n倍，则执行特殊超频，超频次数为n", "再次消耗需求量的冷却液，并减少1秒时间，如果无法供给冷却液则中断超频，如果进度到达100%则中断超频并消耗一次需求量的冷却液使温度降低1K", "由蒸馏水作为冷却液时将产生蒸汽，产生量：消耗量xmin(160,160/(1.4^(373-温度)))", "由钾钠合金作为冷却液时产生热钾钠合金，产生量=消耗量，如果温度高于825K则产生同等量的超临界钠钾合金", "无论反应堆是否具有消耗冷却液的条件都能执行配方","反应堆停止工作后温度将每秒降低1K"])
     event.add(["gtceu:dimensionally_transcendent_plasma_forge",
         "gtceu:advanced_sps_crafting",
         "gtceu:naquadah_reactor",

@@ -1,5 +1,4 @@
 // priority: 96
-const $FusionReactorMachine = Java.loadClass("com.gregtechceu.gtceu.common.machine.multiblock.electric.FusionReactorMachine")
 const $SpaceElevator = Java.loadClass("com.gregtechceu.gtceu.common.machine.multiblock.electric.SpaceElevator")
 const $LargeBoilerMachine = Java.loadClass("com.gregtechceu.gtceu.common.machine.multiblock.steam.LargeBoilerMachine")
 const $LargeTurbineMachine = Java.loadClass("com.gregtechceu.gtceu.common.machine.multiblock.generator.LargeTurbineMachine")
@@ -1482,10 +1481,10 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             .build())
         .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_solid_steel", "gtceu:block/machines/gas_collector")
 
-    event.create("aggregation_device", "multiblock", (holder) => new $FusionReactorMachine(holder, GTValues.UEV))
+    event.create("aggregation_device", "multiblock")
         .rotationState(RotationState.ALL)
         .recipeType("aggregation_device")
-        .recipeModifiers([(machine, recipe) => GTRecipeModifiers.accurateParallel(machine, recipe, machine.getFusionReactorParallel(), false).getFirst(), GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
+        .recipeModifiers([(machine, recipe) => GTRecipeModifiers.accurateParallel(machine, recipe, Math.min(16, 4 * (machine.self().getTier() - GTValues.UEV)), false).getFirst(), GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
         .appearanceBlock(GTBlocks.FUSION_CASING)
         .pattern((definition) =>
             FactoryBlockPattern.start()
@@ -1507,6 +1506,11 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .where("g", Predicates.abilities(PartAbility.EXPORT_ITEMS))
                 .where(" ", Predicates.any())
                 .build())
+        .additionalDisplay((controller, components) => {
+            if (controller.isFormed()) {
+                components.add(Component.translatable("gtceu.multiblock.parallel", Component.literal($FormattingUtil.formatNumbers(Math.min(16, 4 * (controller.self().getTier() - GTValues.UEV)))).darkPurple()).gray())
+            }
+        })
         .workableCasingRenderer("gtceu:block/casings/fusion/fusion_casing", "gtceu:block/multiblock/fusion_reactor")
 
     event.create("super_particle_collider", "multiblock")
@@ -1581,7 +1585,12 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
     event.create("engraving_laser_plant", "multiblock")
         .rotationState(RotationState.NON_Y_AXIS)
         .allowExtendedFacing(false)
-        .recipeModifiers([GTRecipeModifiers.PARALLEL_HATCH, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
+        .recipeModifiers([(machine, recipe) => {
+            if (machine.getRecipeType() == GTRecipeTypes.LASER_ENGRAVER_RECIPES) {
+                return GTRecipeModifiers.hatchParallel(machine, recipe, false).getFirst()
+            }
+            return recipe
+        }, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
         .appearanceBlock(() => Block.getBlock("kubejs:pikyonium_machine_casing"))
         .recipeType("precision_laser_engraver")
         .recipeType("laser_engraver")
@@ -1657,7 +1666,12 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .rotationState(RotationState.ALL)
         .recipeType("dimensionally_transcendent_mixer")
         .recipeType("mixer")
-        .recipeModifiers([GTRecipeModifiers.PARALLEL_HATCH, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
+        .recipeModifiers([(machine, recipe) => {
+            if (machine.getRecipeType() == GTRecipeTypes.MIXER_RECIPES) {
+                return GTRecipeModifiers.reduction(recipe, 1, 0.2)
+            }
+            return recipe
+        }, GTRecipeModifiers.PARALLEL_HATCH, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
         .appearanceBlock(() => Block.getBlock("kubejs:dimensionally_transcendent_casing"))
         .pattern(definition =>
             FactoryBlockPattern.start()
@@ -1683,15 +1697,6 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .where("f", Predicates.blocks("kubejs:neutronium_pipe_casing"))
                 .where(" ", Predicates.any())
                 .build())
-        .onWorking(machine => {
-            if (machine.getOffsetTimer() % 20 == 0) {
-                if (machine.self().getRecipeType() == GTRecipeTypes.MIXER_RECIPES) {
-                    let logic = machine.getRecipeLogic()
-                    logic.setProgress(logic.getProgress() + 20)
-                }
-            }
-            return true
-        })
         .workableCasingRenderer("kubejs:block/dimensionally_transcendent_casing", "gtceu:block/multiblock/fusion_reactor")
 
     event.create("qft", "multiblock")
@@ -3499,13 +3504,13 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             .workableCasingRenderer(baseCasing, overlayModel)
     }
 
-    registerMegaTurbine("steam_mega_turbine", GTValues.EV, 36, GTRecipeTypes.STEAM_TURBINE_FUELS, GTBlocks.CASING_STEEL_TURBINE, GTBlocks.CASING_STEEL_GEARBOX,
+    registerMegaTurbine("steam_mega_turbine", GTValues.EV, 32, GTRecipeTypes.STEAM_TURBINE_FUELS, GTBlocks.CASING_STEEL_TURBINE, GTBlocks.CASING_STEEL_GEARBOX,
         "gtceu:block/casings/mechanic/machine_casing_turbine_steel", "gtceu:block/multiblock/generator/large_steam_turbine")
-    registerMegaTurbine("gas_mega_turbine", GTValues.IV, 48, GTRecipeTypes.GAS_TURBINE_FUELS, GTBlocks.CASING_STAINLESS_TURBINE, GTBlocks.CASING_STAINLESS_STEEL_GEARBOX,
+    registerMegaTurbine("gas_mega_turbine", GTValues.IV, 32, GTRecipeTypes.GAS_TURBINE_FUELS, GTBlocks.CASING_STAINLESS_TURBINE, GTBlocks.CASING_STAINLESS_STEEL_GEARBOX,
         "gtceu:block/casings/mechanic/machine_casing_turbine_stainless_steel", "gtceu:block/multiblock/generator/large_gas_turbine")
     registerMegaTurbine("rocket_mega_turbine", GTValues.IV, 64, GTRecipeTypes.get("rocket_engine"), GTBlocks.CASING_TITANIUM_TURBINE, GTBlocks.CASING_STAINLESS_STEEL_GEARBOX,
         "gtceu:block/casings/mechanic/machine_casing_turbine_titanium", "gtceu:block/multiblock/generator/large_gas_turbine")
-    registerMegaTurbine("plasma_mega_turbine", GTValues.LuV, 72, GTRecipeTypes.PLASMA_GENERATOR_FUELS, GTBlocks.CASING_TUNGSTENSTEEL_TURBINE, GTBlocks.CASING_TUNGSTENSTEEL_GEARBOX,
+    registerMegaTurbine("plasma_mega_turbine", GTValues.LuV, 64, GTRecipeTypes.PLASMA_GENERATOR_FUELS, GTBlocks.CASING_TUNGSTENSTEEL_TURBINE, GTBlocks.CASING_TUNGSTENSTEEL_GEARBOX,
         "gtceu:block/casings/mechanic/machine_casing_turbine_tungstensteel", "gtceu:block/multiblock/generator/large_plasma_turbine")
     registerMegaTurbine("supercritical_mega_steam_turbine", GTValues.ZPM, 128, GTRecipeTypes.SUPERCRITICAL_STEAM_TURBINE_FUELS, GTBlocks.CASING_SUPERCRITICAL_TURBINE, GTBlocks.CASING_TUNGSTENSTEEL_GEARBOX,
         "kubejs:block/supercritical_turbine_casing", "gtceu:block/multiblock/generator/large_plasma_turbine")
