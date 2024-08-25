@@ -12205,115 +12205,6 @@ ServerEvents.recipes((event) => {
         .EUt(GTValues.VA[GTValues.MAX])
         .duration(20)
 
-    function op1(macerator, machine, am, a, b, ci, ch, mch1, mch2, mch3, mch4, tag) {
-        event.forEachRecipe(
-            { type: "gtceu:thermal_centrifuge", input: machine.outputs.item[0].content.ingredient.item }, c => {
-                let thermal_centrifuge = JSON.parse(c.json.toString())
-                event.forEachRecipe(
-                    { type: "gtceu:macerator", input: thermal_centrifuge.outputs.item[0].content.ingredient.item }, d => {
-                        let macerators = JSON.parse(d.json.toString())
-                        gtr.integrated_ore_processor(d.id + c.id.toString().slice(8, -1) + c.id.toString().slice(8, -1) + b.id.toString().slice(8, -1) + a.id.toString().slice(8, -1))
-                            .circuit(ci + 1)
-                            .inputFluids("gtceu" + machine.inputs.fluid[0].content.value[0].tag.slice(5) + " " + 100 * am)
-                            .itemInputs("#" + tag)
-                            .itemOutputs(am + "x " + macerators.outputs.item[0].content.ingredient.item, "gtceu:stone_dust")
-                            .chancedOutput(macerator.outputs.item[1].content.ingredient.item, mch1, mch2)
-                            .chancedOutput(macerator.outputs.item[2].content.ingredient.item, mch3, mch4)
-                            .chancedOutput(am + "x " + machine.outputs.item[1].content.ingredient.item, ch, 0)
-                            .chancedOutput(am + "x " + thermal_centrifuge.outputs.item[1].content.ingredient.item, 3333, 0)
-                            .chancedOutput(am + "x " + macerators.outputs.item[1].content.ingredient.item, 1400, 850)
-                            .EUt(30)
-                            .duration(am * 400 + 100)
-                    })
-            })
-        event.forEachRecipe(
-            { type: "gtceu:macerator", input: machine.outputs.item[0].content.ingredient.item }, c => {
-                let macerators = JSON.parse(c.json.toString())
-                event.forEachRecipe(
-                    { type: "gtceu:centrifuge", input: macerators.outputs.item[0].content.ingredient.item }, d => {
-                        let centrifuge = JSON.parse(d.json.toString())
-                        gtr.integrated_ore_processor(d.id + c.id.toString().slice(8, -1) + c.id.toString().slice(8, -1) + b.id.toString().slice(8, -1) + a.id.toString().slice(8, -1))
-                            .circuit(ci + 2)
-                            .inputFluids("gtceu" + machine.inputs.fluid[0].content.value[0].tag.slice(5) + " " + 100 * am)
-                            .itemInputs("#" + tag)
-                            .itemOutputs(am + "x " + centrifuge.outputs.item[0].content.ingredient.item, "gtceu:stone_dust")
-                            .chancedOutput(macerator.outputs.item[1].content.ingredient.item, mch1, mch2)
-                            .chancedOutput(macerator.outputs.item[2].content.ingredient.item, mch3, mch4)
-                            .chancedOutput(am + "x " + machine.outputs.item[1].content.ingredient.item, ch, 0)
-                            .chancedOutput(am + "x " + macerators.outputs.item[1].content.ingredient.item, 1400, 850)
-                            .chancedOutput(am + "x " + centrifuge.outputs.item[1].content.ingredient.item, 1111, 0)
-                            .EUt(30)
-                            .duration(am * 300 + 100)
-                    })
-            })
-        event.forEachRecipe(
-            { type: "gtceu:sifter", input: machine.outputs.item[0].content.ingredient.item }, c => {
-                let sifter = JSON.parse(c.json.toString())
-                event.forEachRecipe(
-                    { type: "gtceu:centrifuge", input: sifter.outputs.item[3].content.ingredient.item }, d => {
-                        let centrifuge = JSON.parse(d.json.toString())
-                        gtr.integrated_ore_processor(d.id + c.id.toString().slice(8, -1) + c.id.toString().slice(8, -1) + b.id.toString().slice(8, -1) + a.id.toString().slice(8, -1))
-                            .circuit(ci + 3)
-                            .inputFluids("gtceu" + machine.inputs.fluid[0].content.value[0].tag.slice(5) + " " + 100 * am)
-                            .itemInputs("#" + tag)
-                            .itemOutputs("gtceu:stone_dust")
-                            .chancedOutput(macerator.outputs.item[1].content.ingredient.item, mch1, mch2)
-                            .chancedOutput(macerator.outputs.item[2].content.ingredient.item, mch3, mch4)
-                            .chancedOutput(am + "x " + machine.outputs.item[1].content.ingredient.item, ch, 0)
-                            .chancedOutput(am + "x " + sifter.outputs.item[0].content.ingredient.item, 500, 150)
-                            .chancedOutput(am + "x " + sifter.outputs.item[1].content.ingredient.item, 1500, 200)
-                            .chancedOutput(am + "x " + sifter.outputs.item[2].content.ingredient.item, 5000, 1000)
-                            .chancedOutput(am + "x " + centrifuge.outputs.item[0].content.ingredient.item, 2500, 500)
-                            .chancedOutput(am + "x " + centrifuge.outputs.item[1].content.ingredient.item, 278, 55)
-                            .EUt(30)
-                            .duration(am * 400 + 100)
-                    })
-            })
-    }
-    function op2(macerator, am, a, mch1, mch2, mch3, mch4, tag) {
-        event.forEachRecipe(
-            { type: "gtceu:ore_washer", input: macerator.outputs.item[0].content.ingredient.item, id: /.*_distilled/ }, b => {
-                let ore_washer = JSON.parse(b.json.toString())
-                op1(macerator, ore_washer, am, a, b, 1, 3333, mch1, mch2, mch3, mch4, tag)
-            })
-        event.forEachRecipe(
-            { type: "gtceu:chemical_bath", input: macerator.outputs.item[0].content.ingredient.item }, b => {
-                let chemical_bath = JSON.parse(b.json.toString())
-                op1(macerator, chemical_bath, am, a, b, 4, 7000, mch1, mch2, mch3, mch4, tag)
-            })
-        event.forEachRecipe(
-            { type: "gtceu:macerator", input: macerator.outputs.item[0].content.ingredient.item }, b => {
-                let macerators = JSON.parse(b.json.toString())
-                event.forEachRecipe(
-                    { type: "gtceu:centrifuge", input: macerators.outputs.item[0].content.ingredient.item }, c => {
-                        let centrifuge = JSON.parse(c.json.toString())
-                        gtr.integrated_ore_processor(c.id + b.id.toString().slice(8, -1) + a.id.toString().slice(8, -1))
-                            .circuit(1)
-                            .itemInputs("#" + tag)
-                            .itemOutputs(am + "x " + centrifuge.outputs.item[0].content.ingredient.item)
-                            .chancedOutput(macerator.outputs.item[1].content.ingredient.item, mch1, mch2)
-                            .chancedOutput(macerator.outputs.item[2].content.ingredient.item, mch3, mch4)
-                            .chancedOutput(am + "x " + macerators.outputs.item[1].content.ingredient.item, 1400, 850)
-                            .chancedOutput(am + "x " + centrifuge.outputs.item[1].content.ingredient.item, 1111, 0)
-                            .EUt(30)
-                            .duration(am * 100 + 100)
-                    })
-            })
-    }
-
-    event.forEachRecipe(
-        { type: "gtceu:macerator", input: "#forge:ores_in_ground/stone" }, a => {
-            let macerator = JSON.parse(a.json.toString())
-            let am = macerator.outputs.item[0].content.count
-            op2(macerator, am, a, 1400, 850, 6700, 800, macerator.inputs.item[0].content.children[0].tag)
-        })
-    event.forEachRecipe(
-        { type: "gtceu:macerator", input: "#forge:raw_materials" }, a => {
-            let macerator = JSON.parse(a.json.toString())
-            let am = macerator.outputs.item[0].content.count
-            op2(macerator, am, a, 1000, 0, 500, 0, macerator.inputs.item[0].content.ingredient.tag)
-        })
-
     gtr.chemical_reactor("gtceu:ethylene_f_ethanol")
         .circuit(1)
         .inputFluids("gtceu:sulfuric_acid 1000", "gtceu:ethanol 1000")
@@ -12783,8 +12674,8 @@ ServerEvents.recipes((event) => {
         .duration(200)
 
     gtr.super_particle_collider("gtceu:antineutron")
-        .inputFluids("gtceu:positive_electron 200", "gtceu:antiproton 200")
-        .outputFluids("gtceu:antineutron 1")
+        .inputFluids("gtceu:positive_electron 100", "gtceu:antiproton 100")
+        .outputFluids("gtceu:antineutron 2")
         .EUt(GTValues.VA[GTValues.UV])
         .duration(200)
 
@@ -12898,7 +12789,7 @@ ServerEvents.recipes((event) => {
     gtr.aggregation_device("kubejs:draconic_core")
         .notConsumable("kubejs:stabilizer_core")
         .itemInputs("kubejs:draconium_dust", "gtceu:zpm_field_generator", "gtceu:lapotronic_energy_orb", "gtceu:mithril_block", "gtceu:hexanitrohexaaxaisowurtzitane_dust", "gtceu:uv_field_generator", "minecraft:nether_star", "gtceu:enderium_block")
-        .itemOutputs("kubejs:draconic_core")
+        .itemOutputs("2x kubejs:draconic_core")
         .EUt(GTValues.VA[GTValues.UEV])
         .duration(400)
         .fusionStartEU(4800000000)
@@ -12906,7 +12797,7 @@ ServerEvents.recipes((event) => {
     gtr.aggregation_device("kubejs:wyvern_core")
         .notConsumable("kubejs:stabilizer_core")
         .itemInputs("kubejs:draconium_dust", "gtceu:uhv_field_generator", "gtceu:quantum_eye", "gtceu:adamantine_block", "kubejs:draconic_core", "gtceu:uev_field_generator", "gtceu:quantum_star", "gtceu:orichalcum_block")
-        .itemOutputs("kubejs:wyvern_core")
+        .itemOutputs("2x kubejs:wyvern_core")
         .EUt(GTValues.VA[GTValues.UIV])
         .duration(400)
         .fusionStartEU(4800000000)
@@ -12914,7 +12805,7 @@ ServerEvents.recipes((event) => {
     gtr.aggregation_device("kubejs:awakened_core")
         .notConsumable("kubejs:dragon_stabilizer_core")
         .itemInputs("gtceu:draconium_dust", "gtceu:uiv_field_generator", "kubejs:dragon_heart", "gtceu:vibranium_block", "kubejs:wyvern_core", "gtceu:uxv_field_generator", "gtceu:gravi_star", "gtceu:taranium_block")
-        .itemOutputs("kubejs:awakened_core")
+        .itemOutputs("2x kubejs:awakened_core")
         .EUt(GTValues.VA[GTValues.UXV])
         .duration(400)
         .fusionStartEU(4800000000)
@@ -12922,7 +12813,7 @@ ServerEvents.recipes((event) => {
     gtr.aggregation_device("kubejs:chaotic_core")
         .notConsumable("kubejs:dragon_stabilizer_core")
         .itemInputs("gtceu:draconium_nanoswarm", "gtceu:opv_field_generator", "kubejs:chaos_shard", "gtceu:legendarium_block", "kubejs:awakened_core", "gtceu:max_field_generator", "kubejs:unstable_star", "gtceu:draconiumawakened_block")
-        .itemOutputs("kubejs:chaotic_core")
+        .itemOutputs("2x kubejs:chaotic_core")
         .EUt(GTValues.VA[GTValues.OpV])
         .duration(400)
         .fusionStartEU(4800000000)
@@ -13831,6 +13722,46 @@ ServerEvents.recipes((event) => {
         .blastFurnaceTemp(18900)
         .cleanroom(CleanroomType.CLEANROOM)
 
+    gtr.distort("gtceu:mutagen")
+        .notConsumable("gtceu:silver_nanoswarm")
+        .itemInputs("256x gtceu:bio_chaff", "gtceu:naquadria_dust")
+        .inputFluids("gtceu:distilled_water 10000")
+        .outputFluids("gtceu:mutagen 10000")
+        .EUt(GTValues.VA[GTValues.LuV])
+        .duration(2000)
+        .blastFurnaceTemp(12600)
+        .cleanroom(CleanroomType.STERILE_CLEANROOM)
+
+    gtr.distort("kubejs:biological_cells")
+        .notConsumable("gtceu:neutronium_nanoswarm")
+        .itemInputs("256x gtceu:stem_cells", "64x gtceu:meat_dust", "64x gtceu:salt_dust", "64x gtceu:calcium_dust", "64x gtceu:agar_dust", "4x kubejs:tcetieseaweedextract", "2x gtceu:enriched_naquadah_dust", "gtceu:tritanium_dust")
+        .inputFluids("gtceu:mutagen 10000")
+        .itemOutputs("256x kubejs:biological_cells")
+        .EUt(GTValues.VA[GTValues.ZPM])
+        .duration(4000)
+        .blastFurnaceTemp(16200)
+        .cleanroom(CleanroomType.STERILE_CLEANROOM)
+
+    gtr.distort("gtceu:polyvinyl_butyral")
+        .notConsumable("gtceu:carbon_nanoswarm")
+        .itemInputs("96x gtceu:carbon_dust", "4x gtceu:rutile_dust")
+        .inputFluids("gtceu:hydrogen 52000", "gtceu:oxygen 32000", "gtceu:chlorine 4000", "gtceu:propene 16000 ", "gtceu:ethylene 10000")
+        .outputFluids("gtceu:polyvinyl_butyral 36864")
+        .EUt(GTValues.VA[GTValues.ZPM])
+        .duration(2400)
+        .blastFurnaceTemp(6000)
+
+    gtr.distort("gtceu:stellar_energy_rocket_fuel")
+        .notConsumable("gtceu:osmium_nanoswarm")
+        .notConsumable("gtceu:silver_dust")
+        .notConsumable("gtceu:luv_field_generator")
+        .itemInputs("448x gtceu:coal_dust", "64x minecraft:fire_charge", "16x gtceu:enriched_naquadah_dust")
+        .inputFluids("gtceu:hydrogen 640000", "gtceu:oxygen 320000", "gtceu:nitrogen 256000", "gtceu:nitric_acid 48000", "gtceu:benzene 40000", "gtceu:hydrogen_peroxide 32000", "gtceu:sulfuric_acid 16000", "gtceu:toluene 6400")
+        .outputFluids("gtceu:stellar_energy_rocket_fuel 40000")
+        .EUt(GTValues.VA[GTValues.IV])
+        .duration(7200)
+        .blastFurnaceTemp(14400)
+        .cleanroom(CleanroomType.STERILE_CLEANROOM)
 
     gtr.qft("gtceu:fullerene_polymer_matrix_pulp_dust")
         .notConsumable("gtceu:starmetal_nanoswarm")
@@ -14237,6 +14168,7 @@ ServerEvents.recipes((event) => {
         .outputFluids("gtceu:sodium_potassium 1")
         .outputFluids("gtceu:supercritical_steam 12800")
         .duration(200)
+    ["addData(java.lang.String,long)"]("eu", 12800)
 
     gtr.assembler("kubejs:fission_reactor_casing")
         .itemInputs("gtceu:vanadium_steel_frame", "6x gtceu:lead_plate", "6x gtceu:reactor_steel_plate")
@@ -14259,7 +14191,7 @@ ServerEvents.recipes((event) => {
         .duration(200)
 
     gtr.assembler("gtceu:fission_reactor")
-        .itemInputs("gtceu:iv_machine_hull", "4x #gtceu:circuits/uv", "gtceu:computer_monitor_cover", "4x gtceu:neutron_reflector", "8x gtceu:dense_reactor_steel_plate")
+        .itemInputs("gtceu:iv_machine_hull", "4x #gtceu:circuits/iv", "gtceu:computer_monitor_cover", "4x gtceu:neutron_reflector", "8x gtceu:dense_reactor_steel_plate")
         .inputFluids("gtceu:soldering_alloy 288")
         .itemOutputs("gtceu:fission_reactor")
         .EUt(480)
@@ -14316,14 +14248,12 @@ ServerEvents.recipes((event) => {
     function assemble_fuel(name, isnq) {
         let rod = isnq ? "4x gtceu:tungsten_carbide_rod" : "4x gtceu:steel_rod"
         gtr.assembler("kubejs:reactor_" + name + "_dual")
-            .circuit(2)
             .itemInputs("2x kubejs:reactor_" + name + "_simple", rod)
             .itemOutputs("kubejs:reactor_" + name + "_dual")
             .EUt(30)
             .duration(40)
 
         gtr.assembler("kubejs:reactor_" + name + "_quad")
-            .circuit(4)
             .itemInputs("2x kubejs:reactor_" + name + "_dual", rod)
             .itemOutputs("kubejs:reactor_" + name + "_quad")
             .EUt(30)
@@ -14451,4 +14381,39 @@ ServerEvents.recipes((event) => {
         .EUt(7)
         .duration(36000)
     ["addData(java.lang.String,int)"]("FRheat", 8)
+
+    gtr.assembler("gtceu:mega_steam_input_hatch")
+        .circuit(1)
+        .itemInputs("gtceu:bronze_frame", "gtceu:hv_super_tank", "4x gtceu:primitive_fluid_regulator", "8x gtceu:bronze_plate")
+        .itemOutputs("gtceu:mega_steam_input_hatch")
+        .EUt(120)
+        .duration(200)
+
+    gtr.assembler("gtceu:mega_steam_output_hatch")
+        .circuit(2)
+        .itemInputs("gtceu:bronze_frame", "gtceu:hv_super_tank", "4x gtceu:primitive_fluid_regulator", "8x gtceu:bronze_plate")
+        .itemOutputs("gtceu:mega_steam_output_hatch")
+        .EUt(120)
+        .duration(200)
+
+    gtr.assembler("gtmthings:ulv_huge_item_import_bus")
+        .inputFluids("gtceu:soldering_alloy 144")
+        .itemInputs("gtceu:ulv_input_bus", "gtceu:primitive_robot_arm", "gtceu:bronze_crate", "4x #gtceu:circuits/ulv", "4x gtceu:wrought_iron_plate")
+        .itemOutputs("gtmthings:ulv_huge_item_import_bus")
+        .EUt(7)
+        .duration(200)
+
+    gtr.assembler("gtmthings:ulv_huge_item_export_bus")
+        .inputFluids("gtceu:soldering_alloy 144")
+        .itemInputs("gtceu:ulv_output_bus", "gtceu:primitive_robot_arm", "gtceu:bronze_crate", "4x #gtceu:circuits/ulv", "4x gtceu:wrought_iron_plate")
+        .itemOutputs("gtmthings:ulv_huge_item_export_bus")
+        .EUt(7)
+        .duration(200)
+
+    gtr.circuit_assembler("gtceu:data_orb")
+        .itemInputs("gtceu:epoxy_printed_circuit_board", "2x #gtceu:circuits/hv", "8x gtceu:ram_chip", "32x gtceu:nor_memory_chip", "32x gtceu:nand_memory_chip", "32x gtceu:fine_platinum_wire")
+        .itemOutputs("gtceu:data_orb")
+        .EUt(1200)
+        .duration(400)
+        .cleanroom(CleanroomType.CLEANROOM)
 })
