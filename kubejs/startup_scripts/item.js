@@ -74,7 +74,6 @@ StartupEvents.registry("item", event => {
     const space_drones = [1, 2, 3, 4, 5, 6]
     space_drones.forEach((space_drone) => {
         event.create("space_drone_mk" + space_drone)
-            .unstackable()
     })
     const veins = [
         "apatite_vein", "banded_iron_vein", "bauxite_vein_end", "beryllium_vein", "cassiterite_vein", "certus_quartz", "coal_vein", "copper_tin_vein", "copper_vein", "diamond_vein", "galena_vein", "garnet_tin_vein", "garnet_vein", "iron_vein", "lapis_vein", "lubricant_vein", "magnetite_vein_end", "magnetite_vein_ow", "manganese_vein", "manganese_vein_ow", "mica_vein", "mineral_sand_vein", "molybdenum_vein", "monazite_vein", "naquadah_vein", "nether_quartz_vein", "nickel_vein", "oilsands_vein", "olivine_vein", "pitchblende_vein_end", "redstone_vein", "redstone_vein_ow", "saltpeter_vein", "salts_vein", "sapphire_vein", "scheelite_vein", "sheldonite_vein", "sulfur_vein", "tetrahedrite_vein", "topaz_vein"]
@@ -100,15 +99,10 @@ StartupEvents.registry("item", event => {
     event.create("hyperdimensional_drone")
         .unstackable()
     event.create("precision_circuit_assembly_robot_mk1")
-        .unstackable()
     event.create("precision_circuit_assembly_robot_mk2")
-        .unstackable()
     event.create("precision_circuit_assembly_robot_mk3")
-        .unstackable()
     event.create("precision_circuit_assembly_robot_mk4")
-        .unstackable()
     event.create("precision_circuit_assembly_robot_mk5")
-        .unstackable()
     event.create("scrap")
     event.create("scrap_box")
     event.create("nuclear_waste")
@@ -217,11 +211,8 @@ StartupEvents.registry("item", event => {
     event.create("ctc_guidance_unit")
     event.create("highly_dense_polymer_plate")
     event.create("space_probe_mk1")
-        .unstackable()
     event.create("space_probe_mk2")
-        .unstackable()
     event.create("space_probe_mk3")
-        .unstackable()
     event.create("hypercube")
     event.create("annihilation_constrainer")
     event.create("neutronium_antimatter_fuel_rod")
@@ -234,7 +225,6 @@ StartupEvents.registry("item", event => {
         .texture("kubejs:item/antimatter_fuel_rod")
     event.create("solar_light_splitter")
     event.create("create_ultimate_battery")
-        .unstackable()
     event.create("suprachronal_mainframe_complex")
     event.create("zero_point_module_fragments")
     event.create("basic_control_circuit")
@@ -374,6 +364,12 @@ StartupEvents.registry("item", event => {
     create_reactor("thorium")
     create_reactor("mox")
     create_reactor("naquadah")
+    event.create("grindball_soapstone")
+        .unstackable()
+        .maxDamage(50)
+    event.create("grindball_aluminium")
+        .unstackable()
+        .maxDamage(100)
 })
 ItemEvents.modification(event => {
     event.modify("gtceu:raw_coal", modification => {

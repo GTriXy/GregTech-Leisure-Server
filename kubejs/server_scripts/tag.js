@@ -75,10 +75,60 @@ ServerEvents.tags("item", event => {
             "kubejs:magnetohydrodynamicallyconstrainedstarmatter_boots"])
     })
 })
+
+const blocks = ["gtceu:fission_fuel_assembly",
+    "gtceu:supercritical_turbine_casing",
+    "gtceu:cooler",
+    "gtceu:power_core",
+    "gtceu:1m_storage",
+    "gtceu:4m_storage",
+    "gtceu:16m_storage",
+    "gtceu:64m_storage",
+    "gtceu:256m_storage",
+    "gtceu:256g_storage",
+    "gtceu:power_module",
+    "gtceu:power_module_2",
+    "gtceu:power_module_3",
+    "gtceu:power_module_4",
+    "gtceu:power_module_5",
+    "gtceu:law_filter_casing",
+    "gtceu:hyper_core",
+    "gtceu:super_computation_component",
+    "gtceu:super_cooler_component",
+    "gtceu:spacetimecontinuumripper",
+    "gtceu:spacetimebendingcore",
+    "gtceu:stellar_containment_casing",
+    "gtceu:advanced_stellar_containment_casing",
+    "gtceu:ultimate_stellar_containment_casing",
+    "gtceu:component_assembly_line_casing_lv",
+    "gtceu:component_assembly_line_casing_mv",
+    "gtceu:component_assembly_line_casing_hv",
+    "gtceu:component_assembly_line_casing_ev",
+    "gtceu:component_assembly_line_casing_iv",
+    "gtceu:component_assembly_line_casing_luv",
+    "gtceu:component_assembly_line_casing_zpm",
+    "gtceu:component_assembly_line_casing_uv",
+    "gtceu:component_assembly_line_casing_uhv",
+    "gtceu:component_assembly_line_casing_uev",
+    "gtceu:component_assembly_line_casing_uiv",
+    "gtceu:component_assembly_line_casing_uxv",
+    "gtceu:component_assembly_line_casing_opv",
+    "gtceu:component_assembly_line_casing_max",
+    "gtceu:qft_coil"]
+
 ServerEvents.tags("block", event => {
-    const blocks = ["gtceu:fission_fuel_assembly", "gtceu:supercritical_turbine_casing", "gtceu:cooler", "gtceu:power_core", "gtceu:1m_storage", "gtceu:4m_storage", "gtceu:16m_storage", "gtceu:64m_storage", "gtceu:256m_storage", "gtceu:256g_storage", "gtceu:power_module", "gtceu:law_filter_casing", "gtceu:hyper_core", "gtceu:super_computation_component", "gtceu:super_cooler_component", "gtceu:spacetimecontinuumripper", "gtceu:spacetimebendingcore", "gtceu:qft_coil"]
     blocks.forEach((block) => {
         event.add("minecraft:mineable/pickaxe", block)
         event.add("forge:mineable/wrench", block)
+    })
+})
+
+ServerEvents.blockLootTables(event => {
+    blocks.forEach((block) => {
+        event.addBlock(block, b => {
+            b.addPool(p => {
+                p.addItem(block)
+            })
+        })
     })
 })

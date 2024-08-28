@@ -3,6 +3,9 @@ GTCEuStartupEvents.registry("gtceu:recipe_type", event => {
     const $LocalizationUtils = Java.loadClass("com.lowdragmc.lowdraglib.utils.LocalizationUtils")
     const $FormattingUtil = Java.loadClass("com.gregtechceu.gtceu.utils.FormattingUtil")
     const $ICoilType = Java.loadClass("com.gregtechceu.gtceu.api.block.ICoilType")
+    const $ArrayList = Java.loadClass("java.util.ArrayList")
+    const $ItemStack = Java.loadClass("net.minecraft.world.item.ItemStack")
+    const $CycleItemStackHandler = Java.loadClass("com.lowdragmc.lowdraglib.utils.CycleItemStackHandler")
     const $I18n = LDLib.isClient() ? Java.loadClass("net.minecraft.client.resources.language.I18n") : null
     const GenerateDisassembly = Java.loadClass("com.gregtechceu.gtceu.data.recipe.GenerateDisassembly")
     const ResearchManager = Java.loadClass("com.gregtechceu.gtceu.utils.ResearchManager")
@@ -14,17 +17,32 @@ GTCEuStartupEvents.registry("gtceu:recipe_type", event => {
         .setProgressBar(GuiTextures.PROGRESS_BAR_BATH, FillDirection.LEFT_TO_RIGHT)
         .setSound(GTSoundEntries.COOLING)
 
-    event.create("stellar_forge")
+    function getSCTier(tier) {
+        switch (tier) {
+            case 3:
+                return $I18n.get("gtceu.tier.ultimate")
+            case 2:
+                return $I18n.get("gtceu.tier.advanced")
+            default:
+                return $I18n.get("gtceu.tier.base")
+        }
+    }
+
+    GTRecipeTypes.register("stellar_forge", "multiblock")
         .setEUIO("in")
         .setSlotOverlay(false, false, GuiTextures.SOLIDIFIER_OVERLAY)
         .setMaxIOSize(3, 2, 9, 2)
         .setProgressBar(GuiTextures.PROGRESS_BAR_ARC_FURNACE, FillDirection.LEFT_TO_RIGHT)
         .setSound(GTSoundEntries.ARC)
+        .addDataInfo(data => {
+            if (LDLib.isClient()) return $LocalizationUtils.format("gtceu.recipe.stellar_containment_tier", getSCTier(data.getInt("SCTier")))
+        })
 
     GTRecipeTypes.register("dimensionally_transcendent_plasma_forge", "multiblock")
         .setMaxIOSize(2, 2, 2, 2)
         .setEUIO("in")
         .setProgressBar(GuiTextures.PROGRESS_BAR_ARC_FURNACE, FillDirection.LEFT_TO_RIGHT)
+        .setSound(GTSoundEntries.DTPF)
         .addDataInfo(data => {
             return $LocalizationUtils.format("gtceu.recipe.temperature", $FormattingUtil.formatNumbers(data.getInt("ebf_temp")))
         })
@@ -36,7 +54,19 @@ GTCEuStartupEvents.registry("gtceu:recipe_type", event => {
             }
             return ""
         })
-        .setSound(GTSoundEntries.DTPF)
+        .setUiBuilder((recipe, widgetGroup) => {
+            let items = new $ArrayList()
+            let temp = recipe.data.getInt("ebf_temp")
+            items.add(GTCEuAPI.HEATING_COILS.entrySet().stream().filter(coil => {
+                let ctemp = coil.getKey().getCoilTemperature()
+                if (ctemp == 273) {
+                    return temp <= 32000
+                } else {
+                    return ctemp >= temp
+                }
+            }).map(coil => new $ItemStack(coil.getValue().get())).toList())
+            widgetGroup.addWidget(new SlotWidget(new $CycleItemStackHandler(items), 0, widgetGroup.getSize().width - 25, widgetGroup.getSize().height - 32, false, false))
+        })
 
     event.create("plasma_condenser")
         .setEUIO("in")
@@ -227,13 +257,15 @@ GTCEuStartupEvents.registry("gtceu:recipe_type", event => {
 
     GTRecipeTypes.register("assembler_module", "multiblock")
         .setEUIO("in")
-        .setMaxTooltips(4)
         .setSlotOverlay(false, false, GuiTextures.SOLIDIFIER_OVERLAY)
         .setMaxIOSize(16, 1, 4, 0)
         .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
         .setSound(GTSoundEntries.ASSEMBLER)
         .onRecipeBuild((recipeBuilder, provider) => {
             GenerateDisassembly.generateDisassembly(recipeBuilder, provider)
+        })
+        .addDataInfo(data => {
+            if (LDLib.isClient()) return $LocalizationUtils.format("gtceu.recipe.sepm_tier", $FormattingUtil.formatNumbers(data.getInt("SEPMTier")))
         })
 
     event.create("miner_module")
@@ -380,13 +412,6 @@ GTCEuStartupEvents.registry("gtceu:recipe_type", event => {
         .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
         .setSound(GTSoundEntries.COMPUTATION)
 
-    event.create("integrated_ore_processor")
-        .setEUIO("in")
-        .setSlotOverlay(false, false, GuiTextures.SOLIDIFIER_OVERLAY)
-        .setMaxIOSize(2, 9, 1, 0)
-        .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
-        .setSound(GTSoundEntries.MACERATOR)
-
     event.create("dragon_egg_copier")
         .setEUIO("in")
         .setSlotOverlay(false, false, GuiTextures.SOLIDIFIER_OVERLAY)
@@ -483,6 +508,12 @@ GTCEuStartupEvents.registry("gtceu:recipe_type", event => {
             }
             return ""
         })
+        .setUiBuilder((recipe, widgetGroup) => {
+            let items = new $ArrayList()
+            let temp = recipe.data.getInt("ebf_temp")
+            items.add(GTCEuAPI.HEATING_COILS.entrySet().stream().filter(coil => coil.getKey().getCoilTemperature() >= temp).map(coil => new $ItemStack(coil.getValue().get())).toList())
+            widgetGroup.addWidget(new SlotWidget(new $CycleItemStackHandler(items), 0, widgetGroup.getSize().width - 25, widgetGroup.getSize().height - 32, false, false))
+        })
         .setMaxTooltips(4)
         .setSound(GTSoundEntries.ARC)
 
@@ -502,5 +533,98 @@ GTCEuStartupEvents.registry("gtceu:recipe_type", event => {
         .setSound(GTSoundEntries.ARC)
         .addDataInfo(data => {
             return $LocalizationUtils.format("gtceu.recipe.frheat", $FormattingUtil.formatNumbers(data.getInt("FRheat")))
+        })
+
+    GTRecipeTypes.register("fuel_refining", "multiblock")
+        .setMaxIOSize(3, 0, 6, 1)
+        .setEUIO("in")
+        .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
+        .addDataInfo(data => {
+            return $LocalizationUtils.format("gtceu.recipe.temperature", $FormattingUtil.formatNumbers(data.getInt("ebf_temp")))
+        })
+        .addDataInfo(data => {
+            let requiredCoil = $ICoilType.getMinRequiredType(data.getInt("ebf_temp"))
+            if (LDLib.isClient() && requiredCoil != null && requiredCoil.getMaterial() != null) {
+                return $LocalizationUtils.format("gtceu.recipe.coil.tier", $I18n.get(requiredCoil.getMaterial().getUnlocalizedName()))
+            }
+            return ""
+        })
+        .setUiBuilder((recipe, widgetGroup) => {
+            let items = new $ArrayList()
+            let temp = recipe.data.getInt("ebf_temp")
+            items.add(GTCEuAPI.HEATING_COILS.entrySet().stream().filter(coil => coil.getKey().getCoilTemperature() >= temp).map(coil => new $ItemStack(coil.getValue().get())).toList())
+            widgetGroup.addWidget(new SlotWidget(new $CycleItemStackHandler(items), 0, widgetGroup.getSize().width - 25, widgetGroup.getSize().height - 32, false, false))
+        })
+        .setSound(GTSoundEntries.ARC)
+
+    GTRecipeTypes.register("atomic_energy_excitation", "multiblock")
+        .setMaxIOSize(3, 0, 6, 2)
+        .setEUIO("in")
+        .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
+        .addDataInfo(data => {
+            return $LocalizationUtils.format("gtceu.recipe.temperature", $FormattingUtil.formatNumbers(data.getInt("ebf_temp")))
+        })
+        .addDataInfo(data => {
+            let requiredCoil = $ICoilType.getMinRequiredType(data.getInt("ebf_temp"))
+            if (LDLib.isClient() && requiredCoil != null && requiredCoil.getMaterial() != null) {
+                return $LocalizationUtils.format("gtceu.recipe.coil.tier", $I18n.get(requiredCoil.getMaterial().getUnlocalizedName()))
+            }
+            return ""
+        })
+        .setUiBuilder((recipe, widgetGroup) => {
+            let items = new $ArrayList()
+            let temp = recipe.data.getInt("ebf_temp")
+            items.add(GTCEuAPI.HEATING_COILS.entrySet().stream().filter(coil => coil.getKey().getCoilTemperature() >= temp).map(coil => new $ItemStack(coil.getValue().get())).toList())
+            widgetGroup.addWidget(new SlotWidget(new $CycleItemStackHandler(items), 0, widgetGroup.getSize().width - 25, widgetGroup.getSize().height - 32, false, false))
+        })
+        .setSound(GTSoundEntries.ARC)
+
+    GTRecipeTypes.register("component_assembly_line", "multiblock")
+        .setMaxIOSize(9, 1, 9, 0)
+        .setEUIO("in")
+        .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
+        .addDataInfo(data => {
+            return $LocalizationUtils.format("gtceu.recipe.ca_tier", GTValues.VN[data.getInt("CATier")])
+        })
+        .setSound(GTSoundEntries.ASSEMBLER)
+
+    function getGrindball(tier) {
+        switch (tier) {
+            case 2:
+                return $I18n.get("material.gtceu.aluminium")
+            default:
+                return $I18n.get("material.gtceu.soapstone")
+        }
+    }
+
+    GTRecipeTypes.register("isa_mill", "multiblock")
+        .setMaxIOSize(2, 1, 1, 0)
+        .setEUIO("in")
+        .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
+        .setSound(GTSoundEntries.MACERATOR)
+        .addDataInfo(data => {
+            if (LDLib.isClient()) return $LocalizationUtils.format("gtceu.recipe.grindball", getGrindball(data.getInt("grindball")))
+        })
+
+    GTRecipeTypes.register("flotating_beneficiation", "multiblock")
+        .setMaxIOSize(2, 0, 1, 1)
+        .setEUIO("in")
+        .setProgressBar(GuiTextures.PROGRESS_BAR_BATH, FillDirection.LEFT_TO_RIGHT)
+        .setSound(GTSoundEntries.CHEMICAL)
+
+    GTRecipeTypes.register("vacuum_drying", "multiblock")
+        .setMaxIOSize(1, 6, 1, 2)
+        .setEUIO("in")
+        .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
+        .setSound(GTSoundEntries.COOLING)
+        .addDataInfo(data => {
+            return $LocalizationUtils.format("gtceu.recipe.temperature", $FormattingUtil.formatNumbers(data.getInt("ebf_temp")))
+        })
+        .addDataInfo(data => {
+            let requiredCoil = $ICoilType.getMinRequiredType(data.getInt("ebf_temp"))
+            if (LDLib.isClient() && requiredCoil != null && requiredCoil.getMaterial() != null) {
+                return $LocalizationUtils.format("gtceu.recipe.coil.tier", $I18n.get(requiredCoil.getMaterial().getUnlocalizedName()))
+            }
+            return ""
         })
 })

@@ -10,6 +10,7 @@ const $DysonSphere = Java.loadClass("com.gregtechceu.gtceu.common.machine.multib
 const $StorageMachine = Java.loadClass("com.gregtechceu.gtceu.common.machine.multiblock.electric.StorageMachine")
 const $AssemblyLineMachine = Java.loadClass("com.gregtechceu.gtceu.common.machine.multiblock.electric.AssemblyLineMachine")
 const $FissionReactorMachine = Java.loadClass("com.gregtechceu.gtceu.common.machine.multiblock.electric.FissionReactorMachine")
+const $TierCasingMachine = Java.loadClass("com.gregtechceu.gtceu.common.machine.multiblock.electric.TierCasingMachine")
 const $ItemRecipeCapability = Java.loadClass("com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability")
 const $RecipeHelper = Java.loadClass("com.gregtechceu.gtceu.api.recipe.RecipeHelper")
 const $TeamUtil = Java.loadClass("com.hepdd.gtmthings.utils.TeamUtil")
@@ -105,7 +106,13 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         })
         .workableCasingRenderer("gtceu:block/casings/voltage/ulv/side", "gtceu:block/multiblock/implosion_compressor")
 
-    event.create("stellar_forge", "multiblock")
+    let scmap = Predicates.createTierCasingsMap()
+
+    GTBlocks.createTierCasings("stellar_containment_casing", new ResourceLocation("kubejs", "block/stellar_containment_casing"), scmap, 1)
+    GTBlocks.createTierCasings("advanced_stellar_containment_casing", new ResourceLocation("kubejs", "block/stellar_containment_casing"), scmap, 2)
+    GTBlocks.createTierCasings("ultimate_stellar_containment_casing", new ResourceLocation("kubejs", "block/stellar_containment_casing"), scmap, 3)
+
+    event.create("stellar_forge", "multiblock", (holder) => new $TierCasingMachine(holder, "SCTier"))
         .rotationState(RotationState.NON_Y_AXIS)
         .allowExtendedFacing(false)
         .recipeType("stellar_forge")
@@ -136,7 +143,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .or(Predicates.autoAbilities(definition.getRecipeTypes()))
                 .or(Predicates.abilities(PartAbility.MAINTENANCE).setExactLimit(1)))
             .where("c", Predicates.blocks("gtceu:fusion_coil"))
-            .where("d", Predicates.blocks("kubejs:stellar_containment_casing"))
+            .where("d", Predicates.tierCasings(scmap, "SCTier"))
             .where(" ", Predicates.any())
             .build())
         .beforeWorking(machine => {
@@ -539,8 +546,8 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .additionalDisplay((controller, components) => {
             if (controller.isFormed()) {
                 let value = 1 - controller.getCoilTier() * 0.05
-                components.add(Component.literal("耗能倍数：" + value))
-                components.add(Component.literal("耗时倍数：" + value))
+                components.add(Component.translatable("gtceu.machine.eut_multiplier.tooltip", value))
+                components.add(Component.translatable("gtceu.machine.duration_multiplier.tooltip", value))
             }
         })
         .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_inert_ptfe", "gtceu:block/machines/chemical_reactor")
@@ -596,22 +603,22 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
     function getHyperReactorMaxParallel(machine, recipe) {
         let canParallel = false
         switch ($RecipeHelper.getOutputEUt(recipe)) {
-            case GTValues.V[GTValues.UHV]:
+            case GTValues.V[GTValues.UEV]:
                 if (machine.inputFluid("gtceu:orichalcum_plasma 1")) {
                     canParallel = true
                 }
                 break
-            case GTValues.V[GTValues.UEV]:
+            case GTValues.V[GTValues.UIV]:
                 if (machine.inputFluid("gtceu:enderium_plasma 1")) {
                     canParallel = true
                 }
                 break
-            case GTValues.V[GTValues.UIV]:
+            case GTValues.V[GTValues.UXV]:
                 if (machine.inputFluid("gtceu:infuscolium_plasma 1")) {
                     canParallel = true
                 }
                 break
-            case GTValues.V[GTValues.UXV]:
+            case GTValues.V[GTValues.OpV]:
                 if (machine.inputFluid("gtceu:metastable_hassium_plasma 1")) {
                     canParallel = true
                 }
@@ -809,7 +816,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 if (hydrogen >= 1024000000 && helium >= 1024000000 && oc != null) {
                     machine.holder.self().getPersistentData().putLong("hydrogen", hydrogen - 1024000000)
                     machine.holder.self().getPersistentData().putLong("helium", helium - 1024000000)
-                    return $WirelessEnergyManager.addEUToGlobalEnergyMap(uuid, $BigInteger.valueOf(- (5277655810867200 * (8 ** oc))))
+                    return $WirelessEnergyManager.addEUToGlobalEnergyMap(uuid, $BigInteger.valueOf(- (5277655810867200 * (8 ** oc))), machine)
                 }
                 if (machine.inputFluid("gtceu:hydrogen 100000")) {
                     machine.holder.self().getPersistentData().putLong("hydrogen", hydrogen + 10000000)
@@ -1109,7 +1116,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                     .or(Predicates.abilities(PartAbility.PARALLEL_HATCH).setMaxGlobalLimited(1))
                     .or(Predicates.abilities(PartAbility.INPUT_LASER).setMaxGlobalLimited(1))
                     .or(Predicates.abilities(PartAbility.MAINTENANCE).setExactLimit(1)))
-                .where("B", Predicates.blocks("gtceu:fusion_glass"))
+                .where("B", Predicates.blocks("kubejs:rhenium_reinforced_energy_glass"))
                 .where("C", Predicates.blocks("kubejs:titansteel_coil_block"))
                 .where("D", Predicates.blocks("gtceu:neutronium_frame"))
                 .where("E", Predicates.blocks("kubejs:hollow_casing"))
@@ -1117,12 +1124,40 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .build())
         .workableCasingRenderer("gtceu:block/casings/voltage/uxv/side", "gtceu:block/multiblock/fusion_reactor")
 
-    event.create("circuit_assembly_line", "multiblock")
+    event.create("circuit_assembly_line", "multiblock", (holder) => new $StorageMachine(holder, 64))
         .rotationState(RotationState.ALL)
         .recipeType("circuit_assembly_line")
+        .tooltips(Component.translatable("gtceu.machine.circuit_assembly_line.tooltip.0"))
         .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
             Component.translatable("gtceu.circuit_assembly_line")))
-        .recipeModifier(GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK))
+        .recipeModifiers([(machine, recipe) => {
+            let item = machine.getMachineStorageItem()
+            let isParallel = false
+            switch ($RecipeHelper.getInputEUt(recipe)) {
+                case GTValues.VA[GTValues.UV]:
+                    isParallel = item.getId() == "kubejs:precision_circuit_assembly_robot_mk1"
+                    break;
+                case GTValues.VA[GTValues.UHV]:
+                    isParallel = item.getId() == "kubejs:precision_circuit_assembly_robot_mk2"
+                    break
+                case GTValues.VA[GTValues.UEV]:
+                    isParallel = item.getId() == "kubejs:precision_circuit_assembly_robot_mk3"
+                    break
+                case GTValues.VA[GTValues.UIV]:
+                    isParallel = item.getId() == "kubejs:precision_circuit_assembly_robot_mk4"
+                    break
+                case GTValues.VA[GTValues.UXV]:
+                    isParallel = item.getId() == "kubejs:precision_circuit_assembly_robot_mk5"
+                    break
+                default:
+                    break;
+            }
+            if (isParallel) {
+                return GTRecipeModifiers.accurateParallel(machine, recipe, item.getCount() * 2, false).getFirst()
+            } else {
+                return recipe
+            }
+        }, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK)])
         .appearanceBlock(() => Block.getBlock("kubejs:pikyonium_machine_casing"))
         .pattern(definition =>
             FactoryBlockPattern.start()
@@ -1171,6 +1206,14 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .build())
         .workableCasingRenderer("kubejs:block/oxidation_resistant_hastelloy_n_mechanical_casing", "gtceu:block/multiblock/gcym/large_assembler")
 
+    let sepmmap = Predicates.createTierCasingsMap()
+
+    GTBlocks.createActiveTierCasing("power_module", "block/variant/power_module", sepmmap, 1)
+    GTBlocks.createActiveTierCasing("power_module_2", "block/variant/power_module", sepmmap, 2)
+    GTBlocks.createActiveTierCasing("power_module_3", "block/variant/power_module", sepmmap, 3)
+    GTBlocks.createActiveTierCasing("power_module_4", "block/variant/power_module", sepmmap, 4)
+    GTBlocks.createActiveTierCasing("power_module_5", "block/variant/power_module", sepmmap, 5)
+
     event.create("space_elevator", "multiblock", (holder) => new $SpaceElevator(holder))
         .rotationState(RotationState.NON_Y_AXIS)
         .allowExtendedFacing(false)
@@ -1179,7 +1222,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .tooltips(Component.translatable("gtceu.machine.space_elevator.tooltip.1"))
         .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
             Component.translatable("gtceu.space_elevator")))
-        .recipeModifier(GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic(1, 4)))
+        .recipeModifier((machine, recipe) => GTRecipeModifiers.accurateParallel(machine, recipe, 100000, false).getFirst())
         .appearanceBlock(() => Block.getBlock("kubejs:space_elevator_mechanical_casing"))
         .pattern(definition =>
             FactoryBlockPattern.start("right", "down", "front")
@@ -1222,11 +1265,12 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .where("X", Predicates.blocks("kubejs:space_elevator_mechanical_casing")
                     .or(Predicates.abilities(PartAbility.INPUT_ENERGY).setExactLimit(1))
                     .or(Predicates.abilities(PartAbility.IMPORT_ITEMS).setExactLimit(1))
+                    .or(Predicates.abilities(PartAbility.COMPUTATION_DATA_RECEPTION).setExactLimit(1))
                     .or(Predicates.abilities(PartAbility.MAINTENANCE).setExactLimit(1)))
                 .where("E", Predicates.blocks("kubejs:space_elevator_support"))
                 .where("H", Predicates.blocks("gtceu:neutronium_frame"))
                 .where("F", Predicates.blocks("kubejs:space_elevator_internal_support"))
-                .where("C", Predicates.blocks("gtceu:power_module"))
+                .where("C", Predicates.tierCasings(sepmmap, "SEPMTier"))
                 .where("A", Predicates.blocks("kubejs:high_strength_concrete"))
                 .where("D", Predicates.blocks("kubejs:space_elevator_mechanical_casing"))
                 .where("M", Predicates.blocks("gtceu:power_core"))
@@ -1257,76 +1301,31 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 for (let j in coordinatess) {
                     let logic = $GTCapabilityHelper.getRecipeLogic(level, coordinatess[j], null)
                     if (logic != null && logic.getMachine().self().getRecipeType() == GTRecipeTypes.get("space_elevator") && logic.isWorking() && logic.getProgress() > 80) {
-                        return logic.machine.self().getTier() - 8
+                        return [logic.machine.self().getTier() - 8, logic.machine.getCasingTier()]
                     }
                 }
             }
         }
-        return -1
+        return [-1, 0]
     }
 
     event.create("assembler_module", "multiblock")
         .rotationState(RotationState.NON_Y_AXIS)
         .allowExtendedFacing(false)
         .recipeType("assembler_module")
-        .tooltips(Component.translatable("gtceu.machine.perfect_oc"))
+        .tooltips(Component.translatable("gtceu.machine.resource_collection.tooltip.0"))
         .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
             Component.translatable("gtceu.assembler_module")))
         .recipeModifiers([(machine, recipe) => {
             let tier = getSpaceElevatorModule(machine)
-            if (tier < 0) {
+            if (tier[0] < 0) {
+                return null
+            } else if (recipe.getInt("SEPMTier") > tier[1]) {
                 return null
             } else {
-                return GTRecipeModifiers.reduction(machine, recipe, 1, Math.pow(0.8, tier))
+                return GTRecipeModifiers.accurateParallel(machine, GTRecipeModifiers.reduction(machine, recipe, 1, Math.pow(0.8, tier[0])), Math.pow(4, tier[1] - 1), false)
             }
-        }, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
-        .appearanceBlock(() => Block.getBlock("kubejs:space_elevator_mechanical_casing"))
-        .pattern((definition) =>
-            FactoryBlockPattern.start()
-                .aisle("aaa", "bcb", "bbb", "bbb", "bbb")
-                .aisle("aaa", "bbb", "bbb", "bbb", "bbb")
-                .aisle("aaa", "bbb", "bbb", "b~b", "bbb")
-                .where("~", Predicates.controller(Predicates.blocks(definition.get())))
-                .where("b", Predicates.blocks("kubejs:space_elevator_mechanical_casing")
-                    .or(Predicates.autoAbilities(definition.getRecipeTypes()))
-                    .or(Predicates.abilities(PartAbility.COMPUTATION_DATA_RECEPTION).setExactLimit(1)))
-                .where("a", Predicates.blocks("kubejs:module_base"))
-                .where("c", Predicates.blocks("kubejs:module_connector"))
-                .build())
-        .onWorking(machine => {
-            if (machine.getOffsetTimer() % 20 == 0) {
-                if (getSpaceElevatorModule(machine) < 0) {
-                    machine.getRecipeLogic().interruptRecipe()
-                    return false
-                }
-            }
-            return true
-        })
-        .additionalDisplay((controller, components) => {
-            if (controller.isFormed()) {
-                let tier = getSpaceElevatorModule(controller)
-                components.add(Component.literal("该模块" + (tier < 0 ? "未" : "已") + "成功安装"))
-                components.add(Component.literal("耗时倍数x" + Math.pow(0.8, tier)))
-            }
-        })
-        .workableCasingRenderer("kubejs:block/space_elevator_mechanical_casing", "gtceu:block/multiblock/gcym/large_assembler")
-
-    event.create("resource_collection", "multiblock")
-        .rotationState(RotationState.NON_Y_AXIS)
-        .allowExtendedFacing(false)
-        .recipeType("miner_module")
-        .recipeType("drilling_module")
-        .tooltips(Component.translatable("gtceu.machine.perfect_oc"))
-        .tooltips(Component.translatable("gtceu.machine.available_recipe_map_2.tooltip",
-            Component.translatable("gtceu.miner_module"), Component.translatable("gtceu.drilling_module")))
-        .recipeModifiers([(machine, recipe) => {
-            let tier = getSpaceElevatorModule(machine)
-            if (tier < 0) {
-                return null
-            } else {
-                return GTRecipeModifiers.reduction(machine, recipe, 1, Math.pow(0.8, tier))
-            }
-        }, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
+        }, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK)])
         .appearanceBlock(() => Block.getBlock("kubejs:space_elevator_mechanical_casing"))
         .pattern((definition) =>
             FactoryBlockPattern.start()
@@ -1341,7 +1340,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .build())
         .onWorking(machine => {
             if (machine.getOffsetTimer() % 20 == 0) {
-                if (getSpaceElevatorModule(machine) < 0) {
+                if (getSpaceElevatorModule(machine)[0] < 0) {
                     machine.getRecipeLogic().interruptRecipe()
                     return false
                 }
@@ -1351,8 +1350,56 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .additionalDisplay((controller, components) => {
             if (controller.isFormed()) {
                 let tier = getSpaceElevatorModule(controller)
-                components.add(Component.literal("该模块" + (tier < 0 ? "未" : "已") + "成功安装"))
-                components.add(Component.literal("耗时倍数x" + Math.pow(0.8, tier)))
+                components.add(Component.translatable("gtceu.multiblock.parallel", Component.literal($FormattingUtil.formatNumbers(Math.pow(4, tier[1] - 1))).darkPurple()).gray())
+                components.add(Component.literal("该模块" + (tier[0] < 0 ? "未" : "已") + "成功安装"))
+                components.add(Component.translatable("gtceu.machine.duration_multiplier.tooltip", Math.pow(0.8, tier[0])))
+            }
+        })
+        .workableCasingRenderer("kubejs:block/space_elevator_mechanical_casing", "gtceu:block/multiblock/gcym/large_assembler")
+
+    event.create("resource_collection", "multiblock")
+        .rotationState(RotationState.NON_Y_AXIS)
+        .allowExtendedFacing(false)
+        .recipeType("miner_module")
+        .recipeType("drilling_module")
+        .tooltips(Component.translatable("gtceu.machine.resource_collection.tooltip.0"))
+        .tooltips(Component.translatable("gtceu.machine.available_recipe_map_2.tooltip",
+            Component.translatable("gtceu.miner_module"), Component.translatable("gtceu.drilling_module")))
+        .recipeModifiers([(machine, recipe) => {
+            let tier = getSpaceElevatorModule(machine)
+            if (tier[0] < 0) {
+                return null
+            } else {
+                return GTRecipeModifiers.accurateParallel(machine, GTRecipeModifiers.reduction(machine, recipe, 1, Math.pow(0.8, tier[0])), Math.pow(4, tier[1] - 1), false)
+            }
+        }, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK)])
+        .appearanceBlock(() => Block.getBlock("kubejs:space_elevator_mechanical_casing"))
+        .pattern((definition) =>
+            FactoryBlockPattern.start()
+                .aisle("aaa", "bcb", "bbb", "bbb", "bbb")
+                .aisle("aaa", "bbb", "bbb", "bbb", "bbb")
+                .aisle("aaa", "bbb", "bbb", "b~b", "bbb")
+                .where("~", Predicates.controller(Predicates.blocks(definition.get())))
+                .where("b", Predicates.blocks("kubejs:space_elevator_mechanical_casing")
+                    .or(Predicates.autoAbilities(definition.getRecipeTypes())))
+                .where("a", Predicates.blocks("kubejs:module_base"))
+                .where("c", Predicates.blocks("kubejs:module_connector"))
+                .build())
+        .onWorking(machine => {
+            if (machine.getOffsetTimer() % 20 == 0) {
+                if (getSpaceElevatorModule(machine)[0] < 0) {
+                    machine.getRecipeLogic().interruptRecipe()
+                    return false
+                }
+            }
+            return true
+        })
+        .additionalDisplay((controller, components) => {
+            if (controller.isFormed()) {
+                let tier = getSpaceElevatorModule(controller)
+                components.add(Component.translatable("gtceu.multiblock.parallel", Component.literal($FormattingUtil.formatNumbers(Math.pow(4, tier[1] - 1))).darkPurple()).gray())
+                components.add(Component.literal("该模块" + (tier[0] < 0 ? "未" : "已") + "成功安装"))
+                components.add(Component.translatable("gtceu.machine.duration_multiplier.tooltip", Math.pow(0.8, tier[0])))
             }
         })
         .workableCasingRenderer("kubejs:block/space_elevator_mechanical_casing", "gtceu:block/multiblock/gcym/large_assembler")
@@ -1568,8 +1615,8 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .build())
         .additionalDisplay((controller, components) => {
             if (controller.isFormed()) {
-                components.add(Component.literal("耗能倍数：" + (controller.getMachineStorageItem().getId() == "gtceu:vibranium_nanoswarm" ? 0.25 : 1)))
-                components.add(Component.literal("耗时倍数：" + getPCBReduction(controller)))
+                components.add(Component.translatable("gtceu.machine.eut_multiplier.tooltip", (controller.getMachineStorageItem().getId() == "gtceu:vibranium_nanoswarm" ? 0.25 : 1)))
+                components.add(Component.translatable("gtceu.machine.duration_multiplier.tooltip", getPCBReduction(controller)))
             }
         })
         .workableCasingRenderer("gtceu:block/casings/gcym/watertight_casing", "gtceu:block/multiblock/gcym/large_maceration_tower")
@@ -1600,10 +1647,10 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .allowExtendedFacing(false)
         .allowFlip(false)
         .recipeType("large_gas_collector")
-        .tooltips(Component.translatable("gtceu.machine.perfect_oc"))
+        .tooltips(Component.translatable("gtceu.machine.large_gas_collector.tooltip.0"))
         .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
             Component.translatable("gtceu.large_gas_collector")))
-        .recipeModifier(GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK))
+        .recipeModifiers([(machine, recipe) => GTRecipeModifiers.accurateParallel(machine, recipe, 100000, false).getFirst(), GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK)])
         .appearanceBlock(GTBlocks.CASING_STEEL_SOLID)
         .pattern(definition => FactoryBlockPattern.start()
             .aisle("aaaaa", "abbba", "abbba", "abbba", "aaaaa")
@@ -1747,7 +1794,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             }
             return recipe
         }, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
-        .appearanceBlock(() => Block.getBlock("kubejs:pikyonium_machine_casing"))
+        .appearanceBlock(() => Block.getBlock("kubejs:iridium_casing"))
         .pattern(definition => FactoryBlockPattern.start()
             .aisle("     AAAAA     ", "     AEEEA     ", "AAAAAAEEEAAAAAA", "AEEEEEEEEEEEEEA", "AAAAAAEEEAAAAAA", "     AEEEA     ", "     AAAAA     ")
             .aisle("AAAAAAAAAAAAAAA", "AAAAAFFFFFAAAAA", "AAAAAFFFFFAAAAA", "AAAAAFFFFFAAAAA", "AAAAAFFFFFAAAAA", "AAAAAFFFFFAAAAA", "AAAAAAAAAAAAAAA")
@@ -1761,11 +1808,11 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             .where("~", Predicates.controller(Predicates.blocks(definition.get())))
             .where("A", Predicates.blocks("kubejs:iridium_casing")
                 .or(Predicates.abilities(PartAbility.PARALLEL_HATCH).setMaxGlobalLimited(1))
-                .or(Predicates.abilities(PartAbility.IMPORT_ITEMS).setPreviewCount(1))
-                .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS).setPreviewCount(1))
+                .or(Predicates.abilities(PartAbility.IMPORT_ITEMS).setMaxGlobalLimited(8))
+                .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS).setMaxGlobalLimited(4))
                 .or(Predicates.abilities(PartAbility.INPUT_ENERGY).setMaxGlobalLimited(2))
                 .or(Predicates.abilities(PartAbility.MAINTENANCE).setExactLimit(1))
-                .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setPreviewCount(1))
+                .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setMaxGlobalLimited(4))
                 .or(Predicates.abilities(PartAbility.COMPUTATION_DATA_RECEPTION).setMaxGlobalLimited(1)))
             .where("B", Predicates.blocks("gtceu:filter_casing"))
             .where("C", Predicates.blocks("gtceu:high_power_casing"))
@@ -2084,7 +2131,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
             if (controller.isFormed()) {
                 let value = 1 - controller.getCoilTier() * 0.05
                 components.add(Component.literal("耗时能数：" + value))
-                components.add(Component.literal("耗时倍数：" + value))
+                components.add(Component.translatable("gtceu.machine.duration_multiplier.tooltip", value))
             }
         })
         .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_inert_ptfe", "gtceu:block/machines/chemical_reactor")
@@ -3135,6 +3182,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .recipeType("sifter")
         .recipeType("macerator")
         .recipeType("extractor")
+        .recipeType("dehydrator")
         .tooltips(Component.translatable("gtceu.machine.eut_multiplier.tooltip", 0.9))
         .tooltips(Component.translatable("gtceu.machine.duration_multiplier.tooltip", 0.8))
         .tooltips(Component.translatable("gtceu.machine.processing_plant.tooltip.0"))
@@ -3180,6 +3228,9 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                     break
                 case GTRecipeTypes.EXTRACTOR_RECIPES:
                     isrecipe = machine.getMachineStorageItem().getId() == "gtceu:" + tiers[tier][0] + "_extractor"
+                    break
+                case GTRecipeTypes.DEHYDRATOR_RECIPES:
+                    isrecipe = machine.getMachineStorageItem().getId() == "gtceu:" + tiers[tier][0] + "_dehydrator"
                     break
                 default:
                     break
@@ -3338,7 +3389,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .where("D", Predicates.blocks("gtceu:high_power_casing"))
                 .where("E", Predicates.blocks("kubejs:hollow_casing"))
                 .where("F", Predicates.blocks("kubejs:force_field_glass"))
-                .where("G", Predicates.blocks("kubejs:stellar_containment_casing"))
+                .where("G", Predicates.blocks("gtceu:ultimate_stellar_containment_casing"))
                 .where(" ", Predicates.any())
                 .build())
         .additionalDisplay((controller, components) => {
@@ -3816,7 +3867,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
         .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
             Component.translatable("gtceu.large_boiler")))
         .recipeModifier((machine, recipe) => $LargeBoilerMachine.recipeModifier(machine, recipe))
-        .appearanceBlock(GTBlocks.CASING_BRONZE_BRICKS)
+        .appearanceBlock(GTBlocks.CASING_TUNGSTENSTEEL_ROBUST)
         .pattern(definition =>
             dtpf().where("a", Predicates.controller(Predicates.blocks(definition.get())))
                 .where("e", Predicates.blocks("gtceu:robust_machine_casing")
@@ -4042,7 +4093,7 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                 .where("M", Predicates.blocks("gtceu:hyper_core"))
                 .where("N", Predicates.blocks("kubejs:echo_casing"))
                 .where("P", Predicates.blocks("kubejs:dyson_deployment_magnet"))
-                .where("Q", Predicates.blocks("gtceu:power_module"))
+                .where("Q", Predicates.blocks("gtceu:power_module_5"))
                 .where("R", Predicates.blocks("gtceu:vibranium_frame"))
                 .where("S", Predicates.blocks("kubejs:containment_field_generator"))
                 .where("T", Predicates.blocks("kubejs:dyson_deployment_core"))
@@ -4971,4 +5022,325 @@ GTCEuStartupEvents.registry("gtceu:machine", event => {
                     .or(Predicates.countBlock("Cooler", "gtceu:cooler")))
                 .build())
         .workableCasingRenderer("kubejs:block/fission_reactor_casing", "gtceu:block/multiblock/fusion_reactor")
+
+    event.create("atomic_energy_excitation_plant", "multiblock", (holder) => new $CoilWorkableElectricMultiblockMachine(holder))
+        .rotationState(RotationState.NON_Y_AXIS)
+        .recipeType("fuel_refining")
+        .recipeType("atomic_energy_excitation")
+        .tooltips(Component.translatable("gtceu.multiblock.laser.tooltip"))
+        .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
+        .tooltips(Component.translatable("gtceu.machine.available_recipe_map_2.tooltip",
+            Component.translatable("gtceu.atomic_energy_excitation"), Component.translatable("gtceu.fuel_refining")))
+        .recipeModifiers([GTRecipeModifiers.PARALLEL_HATCH, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK)])
+        .appearanceBlock(() => Block.getBlock("kubejs:dimensionally_transcendent_casing"))
+        .pattern((definition) =>
+            FactoryBlockPattern.start()
+                .aisle("                   ", "                   ", "                   ", "                   ", "         A         ", "        ABA        ", "        CCC        ", "        ABA        ", "         A         ", "                   ", "                   ", "                   ", "                   ")
+                .aisle("DDD             DDD", "DDD     AAA     EEE", "EEE   AA A AA   EEE", "EEE  A   A   A  EEE", "EEE  A  AAA  A   B ", " A  A  AA#AA  A  A ", " AAAB  CC#CC  BAAA ", "    A  AA#AA  A    ", "     A  AAA  A     ", "     A   A   A     ", "      AA A AA      ", "        ABA        ", "                   ")
+                .aisle("DDD     AAA     DDD", "D#D   AAFGFAA   E#E", "E#E  AHHAHAHHA  E#E", "E#E AHAAAHAAAHA E#E", "E#E AHA AIA AHA A#A", "AHAAFA B###B AFAAHA", "AFHHGA C#J#C AGHHFA", " AAAFA B###B AFAAA ", "    AHA AIA AHA    ", "    AHAAAHAAAHA    ", "     AHHAHAHHA     ", "      AAFGFAA      ", "        AAA        ")
+                .aisle("D~D             DDD", "DDD     AAA     EEE", "EEE   AA A AA   EEE", "EEE  A   A   A  EEE", "EEE  A  AAA  A   B ", " A  A  AA#AA  A  A ", " AAAB  CC#CC  BAAA ", "    A  AA#AA  A    ", "     A  AAA  A     ", "     A   A   A     ", "      AA A AA      ", "        ABA        ", "                   ")
+                .aisle("                   ", "                   ", "                   ", "                   ", "         A         ", "        ABA        ", "        CCC        ", "        ABA        ", "         A         ", "                   ", "                   ", "                   ", "                   ")
+                .where("~", Predicates.controller(Predicates.blocks(definition.get())))
+                .where("A", Predicates.blocks("kubejs:degenerate_rhenium_constrained_casing"))
+                .where("B", Predicates.blocks("kubejs:rhenium_reinforced_energy_glass"))
+                .where("C", Predicates.heatingCoils())
+                .where("D", Predicates.blocks("kubejs:dimensionally_transcendent_casing")
+                    .or(Predicates.abilities(PartAbility.INPUT_ENERGY).setMaxGlobalLimited(2))
+                    .or(Predicates.abilities(PartAbility.INPUT_LASER).setMaxGlobalLimited(1))
+                    .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS).setMaxGlobalLimited(4))
+                    .or(Predicates.abilities(PartAbility.IMPORT_ITEMS).setMaxGlobalLimited(1))
+                    .or(Predicates.abilities(PartAbility.EXPORT_FLUIDS).setMaxGlobalLimited(1))
+                    .or(Predicates.abilities(PartAbility.MAINTENANCE).setExactLimit(1))
+                    .or(Predicates.abilities(PartAbility.PARALLEL_HATCH).setMaxGlobalLimited(1)))
+                .where("E", Predicates.blocks("kubejs:dimension_injection_casing"))
+                .where("F", Predicates.blocks("kubejs:accelerated_pipeline"))
+                .where("G", Predicates.blocks("kubejs:restraint_device"))
+                .where("H", Predicates.blocks("kubejs:neutronium_pipe_casing"))
+                .where("I", Predicates.blocks("kubejs:containment_field_generator"))
+                .where("J", Predicates.blocks("kubejs:aggregatione_core"))
+                .where(" ", Predicates.any())
+                .where("#", Predicates.air())
+                .build())
+        .beforeWorking((machine, recipe) => {
+            if (recipe.data.getInt("ebf_temp") <= machine.getCoilType().getCoilTemperature()) {
+                return true
+            }
+            machine.getRecipeLogic().interruptRecipe()
+            return false
+        })
+        .additionalDisplay((controller, components) => {
+            if (controller.isFormed()) {
+                components.add(Component.translatable("gtceu.multiblock.blast_furnace.max_temperature", Text.of($FormattingUtil.formatNumbers(controller.getCoilType().getCoilTemperature()) + "K").red()))
+            }
+        })
+        .workableCasingRenderer("kubejs:block/dimensionally_transcendent_casing", "gtceu:block/multiblock/fusion_reactor")
+
+    event.create("advanced_integrated_ore_processor", "multiblock")
+        .rotationState(RotationState.ALL)
+        .recipeType("integrated_ore_processor")
+        .tooltips(Component.translatable("gtceu.machine.integrated_ore_processor.tooltip.0"))
+        .tooltips(Component.translatable("gtceu.machine.advanced_integrated_ore_processor.tooltip.0"))
+        .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
+            Component.translatable("gtceu.integrated_ore_processor")))
+        .recipeModifier((machine, recipe) => GTRecipeModifiers.accurateParallel(machine, GTRecipeModifiers.reduction(machine, recipe, 1, 0), 2147483647, false).getFirst())
+        .appearanceBlock(GTBlocks.CASING_TUNGSTENSTEEL_ROBUST)
+        .pattern((definition) =>
+            FactoryBlockPattern.start()
+                .aisle("    AAAAAAAAAA ", "    AAAGGGGAAA ", "    AAAGHHGAAA ", "    AAAGHHGAAA ", "    AAAGHHGAAA ", "    AAAGHHGAAA ", "    AAAGHHGAAA ", "    AAAGHHGAAA ", "    AAAGHHGAAA ", "   AAAAGHHGAAAA", "     AAGHHGAA  ", "      AGGGGA   ")
+                .aisle("   AAAAAAAAAAAA", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("   AAAAAAAAAAAA", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("   AAAAAAAAAAAA", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "   AAA      AAA", "     A      A  ", "      AGGGGA   ")
+                .aisle("   AAAAAAAAAAAA", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "   AAA      AAA", "     A      A  ", "      AGGGGA   ")
+                .aisle("   AAAAAAAAAAAA", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("   AAAAAAAAAAAA", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("   AAAAAAAAAAAA", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "   AAA      AAA", "     A      A  ", "      AGGGGA   ")
+                .aisle("   AAAAAAAAAAAA", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "   AAA      AAA", "     A      A  ", "      AGGGGA   ")
+                .aisle("   AAAAAAAAAAAA", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("   AAAAAAAAAAAA", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("   AAAAAAAAAAAA", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "   AAA      AAA", "     A      A  ", "      AGGGGA   ")
+                .aisle("   AAAAAAAAAAAA", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "   AAA      AAA", "     A      A  ", "      AGGGGA   ")
+                .aisle("   AAAAAAAAAAAA", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("   AAAAAAAAAAAA", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("   AAAAAAAAAAAA", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "   AAA      AAA", "     A      A  ", "      AGGGGA   ")
+                .aisle("   AAAAAAAAAAAA", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "   AAA      AAA", "     A      A  ", "      AGGGGA   ")
+                .aisle("   AAAAAAAAAAAA", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("   AAAAAAAAAAAA", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("   AAAAAAAAAAAA", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "   AAA      AAA", "     A      A  ", "      AGGGGA   ")
+                .aisle("   AAAAAAAAAAAA", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "   AAA      AAA", "     A      A  ", "      AGGGGA   ")
+                .aisle("   AAAAAAAAAAAA", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("   AAAAAAAAAAAA", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("   AAAAAAAAAAAA", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "   AAA      AAA", "     A      A  ", "      AGGGGA   ")
+                .aisle("   AAAAAAAAAAAA", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "   AAA      AAA", "     A      A  ", "      AGGGGA   ")
+                .aisle("   AAAAAAAAAAAA", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("   AAAAAAAAAAAA", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("   AAAAAAAAAAAA", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "   AAA      AAA", "     A      A  ", "      AGGGGA   ")
+                .aisle("   AAAAAAAAAAAA", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "    A        A ", "   AAA      AAA", "     A      A  ", "      AGGGGA   ")
+                .aisle("IIIAAAAAAAAAAAA", "IIIBADEE  EEDAB", "IIIBADEE  EEDAB", "IIIAADEE  EEDAB", "IIIAADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("IIIAAAAAAAAAAAA", "IDIBADEE  EEDAB", "IDIBADEE  EEDAB", "IDIAADEE  EEDAB", "IIIAADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   BADEE  EEDAB", "   AAAFF  FFAAA", "     AFF  FFA  ", "      AGCCGA   ")
+                .aisle("III AAAAAAAAAA ", "III AAAGGGGAAA ", "I~I AAAGHHGAAA ", "III AAAGHHGAAA ", "III AAAGHHGAAA ", "    AAAGHHGAAA ", "    AAAGHHGAAA ", "    AAAGHHGAAA ", "    AAAGHHGAAA ", "   AAAAGHHGAAAA", "     AAGHHGAA  ", "      AGGGGA   ")
+                .where("~", Predicates.controller(Predicates.blocks(definition.get())))
+                .where("A", Predicates.blocks("gtceu:robust_machine_casing"))
+                .where("B", Predicates.blocks("gtceu:hsss_frame"))
+                .where("C", Predicates.blocks("kubejs:restraint_device"))
+                .where("D", Predicates.blocks("gtceu:tungstensteel_pipe_casing"))
+                .where("E", Predicates.blocks("gtceu:tungstensteel_gearbox"))
+                .where("F", Predicates.blocks("gtceu:assembly_line_grating"))
+                .where("G", Predicates.blocks("gtceu:sturdy_machine_casing"))
+                .where("H", Predicates.blocks("kubejs:hsss_reinforced_borosilicate_glass"))
+                .where("I", Predicates.blocks("gtceu:robust_machine_casing")
+                    .or(Predicates.abilities(PartAbility.INPUT_LASER))
+                    .or(Predicates.abilities(PartAbility.IMPORT_ITEMS))
+                    .or(Predicates.abilities(PartAbility.EXPORT_ITEMS))
+                    .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS)))
+                .where(" ", Predicates.any())
+                .build())
+        .workableCasingRenderer("gtceu:block/casings/solid/machine_casing_robust_tungstensteel", "gtceu:block/multiblock/gcym/large_maceration_tower")
+
+    let calmap = Predicates.createTierCasingsMap()
+    tiers.slice(1).forEach((t) => {
+        GTBlocks.createTierCasings("component_assembly_line_casing_" + t[0], new ResourceLocation("kubejs:block/component_assembly_line_casing_" + t[0]), calmap, t[1])
+    })
+
+    event.create("component_assembly_line", "multiblock", (holder) => new $TierCasingMachine(holder, "CATier"))
+        .rotationState(RotationState.ALL)
+        .recipeType("component_assembly_line")
+        .tooltips(Component.translatable("gtceu.multiblock.laser.tooltip"))
+        .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
+        .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
+            Component.translatable("gtceu.component_assembly_line")))
+        .recipeModifiers([GTRecipeModifiers.PARALLEL_HATCH, GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK)])
+        .appearanceBlock(() => Block.getBlock("kubejs:iridium_casing"))
+        .pattern((definition) =>
+            FactoryBlockPattern.start()
+                .aisle("AAAAAAAAA", "A  NNN  A", "A       A", "A       A", "A       A", "A       A", "AA     AA", " AAAAAAA ", "         ", "         ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GHAAAHG ", "         ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F I   I F", "FJ     JF", "FJ     JF", "AJ     JA", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F  M M  F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "FL     LF", "FL AAA LF", "FL     LF", "FL     LF", "FL  J  LF", "ALL I LLA", "G LLILL G", " GA   AG ", "   KKK   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F I   I F", "FJ     JF", "FJ     JF", "AJ     JA", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "AL     LA", "AL AAA LA", "AL     LA", "AL     LA", "AL  J  LA", "ALL I LLA", "G LLILL G", " GA   AG ", "   KKK   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F I   I F", "FJ     JF", "FJ     JF", "AJ     JA", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "FL     LF", "FL AAA LF", "FL     LF", "FL     LF", "FL  J  LF", "ALL I LLA", "G LLILL G", " GA   AG ", "   KKK   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F I   I F", "FJ     JF", "FJ     JF", "AJ     JA", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "AL     LA", "AL AAA LA", "AL     LA", "AL     LA", "AL  J  LA", "ALL I LLA", "G LLILL G", " GA   AG ", "   KKK   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F I   I F", "FJ     JF", "FJ     JF", "AJ     JA", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "FL     LF", "FL AAA LF", "FL     LF", "FL     LF", "FL  J  LF", "ALL I LLA", "G LLILL G", " GA   AG ", "   KKK   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F I   I F", "FJ     JF", "FJ     JF", "AJ     JA", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "AL     LA", "AL AAA LA", "AL     LA", "AL     LA", "AL  J  LA", "ALL I LLA", "G LLILL G", " GA   AG ", "   KKK   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F I   I F", "FJ     JF", "FJ     JF", "AJ     JA", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "FL     LF", "FL AAA LF", "FL     LF", "FL     LF", "FL  J  LF", "ALL I LLA", "G LLILL G", " GA   AG ", "   KKK   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F I   I F", "FJ     JF", "FJ     JF", "AJ     JA", "G       G", " GA   AG ", "   AKA   ")
+                .aisle("AAAAAAAAA", "F       F", "F  AAA  F", "F       F", "F       F", "F       F", "A       A", "G       G", " GHAAAHG ", "         ")
+                .aisle("AAAAAAAAA", "A  B B  A", "A  CCC  A", "A  CCC  A", "A       A", "A       A", "AA DDD AA", " AAD~DAA ", "   DDD   ", "         ")
+                .where("~", Predicates.controller(Predicates.blocks(definition.get())))
+                .where("A", Predicates.blocks("kubejs:iridium_casing"))
+                .where("B", Predicates.blocks("gtceu:tungsten_steel_frame")
+                    .or(Predicates.abilities(PartAbility.IMPORT_ITEMS))
+                    .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS)))
+                .where("C", Predicates.blocks("kubejs:iridium_casing")
+                    .or(Predicates.abilities(PartAbility.IMPORT_ITEMS))
+                    .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS)))
+                .where("D", Predicates.blocks("kubejs:iridium_casing")
+                    .or(Predicates.abilities(PartAbility.PARALLEL_HATCH).setExactLimit(1))
+                    .or(Predicates.abilities(PartAbility.MAINTENANCE).setExactLimit(1)))
+                .where("F", Predicates.blocks("kubejs:hsss_reinforced_borosilicate_glass"))
+                .where("G", Predicates.blocks("gtceu:filter_casing"))
+                .where("H", Predicates.blocks("kubejs:iridium_casing")
+                    .or(Predicates.abilities(PartAbility.INPUT_ENERGY).setMaxGlobalLimited(2))
+                    .or(Predicates.abilities(PartAbility.INPUT_LASER).setMaxGlobalLimited(1)))
+                .where("I", Predicates.blocks("gtceu:hastelloy_n_frame"))
+                .where("J", Predicates.blocks("kubejs:advanced_assembly_line_unit"))
+                .where("K", Predicates.tierCasings(calmap, "CATier"))
+                .where("L", Predicates.blocks("gtceu:ptfe_pipe_casing"))
+                .where("M", Predicates.blocks("gtceu:tungsten_steel_frame"))
+                .where("N", Predicates.blocks("kubejs:iridium_casing")
+                    .or(Predicates.abilities(PartAbility.EXPORT_ITEMS)))
+                .where(" ", Predicates.any())
+                .build())
+        .workableCasingRenderer("kubejs:block/iridium_casing", "gtceu:block/multiblock/assembly_line")
+
+    function getGrindball(id) {
+        switch (id) {
+            case "kubejs:grindball_aluminium":
+                return 2
+            case "kubejs:grindball_soapstone":
+                return 1
+            default:
+                return 0
+        }
+    }
+
+    event.create("isa_mill", "multiblock", (holder) => new $StorageMachine(holder, 1))
+        .rotationState(RotationState.ALL)
+        .recipeType("isa_mill")
+        .tooltips(Component.translatable("gtceu.machine.isa_mill.tooltip.0"))
+        .tooltips(Component.translatable("gtceu.machine.perfect_oc"))
+        .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
+            Component.translatable("gtceu.isa_mill")))
+        .recipeModifier((machine, recipe) => {
+            let item = machine.getMachineStorageItem()
+            if (getGrindball(item.getId()) >= recipe.data.getInt("grindball")) {
+                let damage = item.getDamageValue()
+                if (damage < item.getMaxDamage()) {
+                    item.setDamageValue(damage + 1)
+                    machine.setMachineStorageItem(item)
+                } else {
+                    machine.setMachineStorageItem(Items.AIR)
+                }
+                return $RecipeHelper.applyOverclock(OverclockingLogic.PERFECT_OVERCLOCK, recipe, machine.getOverclockVoltage())
+            }
+            return null
+        })
+        .appearanceBlock(() => Block.getBlock("kubejs:inconel_625_casing"))
+        .pattern((definition) =>
+            FactoryBlockPattern.start()
+                .aisle("BBB", "BBB", "BBB")
+                .aisle("BBB", "BCB", "BBB")
+                .aisle("BBB", "BCB", "BBB")
+                .aisle("BBB", "BCB", "BBB")
+                .aisle("BBB", "BCB", "BBB")
+                .aisle("BBB", "BCB", "BBB")
+                .aisle("AAA", "A~A", "AAA")
+                .where("~", Predicates.controller(Predicates.blocks(definition.get())))
+                .where("B", Predicates.blocks("kubejs:inconel_625_casing")
+                    .or(Predicates.abilities(PartAbility.INPUT_ENERGY).setMaxGlobalLimited(2))
+                    .or(Predicates.abilities(PartAbility.IMPORT_ITEMS).setMaxGlobalLimited(4))
+                    .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS).setMaxGlobalLimited(1))
+                    .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setMaxGlobalLimited(1))
+                    .or(Predicates.abilities(PartAbility.MAINTENANCE).setExactLimit(1))
+                    .or(Predicates.abilities(PartAbility.MUFFLER).setExactLimit(1)))
+                .where("C", Predicates.blocks("kubejs:inconel_625_gearbox"))
+                .where("A", Predicates.blocks("kubejs:inconel_625_pipe"))
+                .build())
+        .workableCasingRenderer("kubejs:block/inconel_625_casing", "gtceu:block/multiblock/gcym/large_maceration_tower")
+
+    event.create("flotation_cell_regulator", "multiblock")
+        .rotationState(RotationState.ALL)
+        .recipeType("flotating_beneficiation")
+        .tooltips(Component.translatable("gtceu.machine.flotation_cell_regulator.tooltip.0"))
+        .tooltips(Component.translatable("gtceu.machine.perfect_oc"))
+        .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
+            Component.translatable("gtceu.flotating_beneficiation")))
+        .recipeModifiers([GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.PERFECT_OVERCLOCK)])
+        .appearanceBlock(() => Block.getBlock("kubejs:hastelloy_n_75_casing"))
+        .pattern((definition) =>
+            FactoryBlockPattern.start()
+                .aisle("  AAA  ", " AAAAA ", "AAAAAAA", "AAAAAAA", "AAAAAAA", " AAAAA ", "  AAA  ")
+                .aisle("  AAA  ", " AADAA ", "AADDDAA", "ADDDDDA", "AADDDAA", " AADAA ", "  AAA  ")
+                .aisle("       ", "   B   ", "  B#B  ", " B#C#B ", "  B#B  ", "   B   ", "       ")
+                .aisle("       ", "   B   ", "  B#B  ", " B#C#B ", "  B#B  ", "   B   ", "       ")
+                .aisle("       ", "   B   ", "  B#B  ", " B#C#B ", "  B#B  ", "   B   ", "       ")
+                .aisle("       ", "   B   ", "  B#B  ", " B#C#B ", "  B#B  ", "   B   ", "       ")
+                .aisle("       ", "   B   ", "  B#B  ", " B#C#B ", "  B#B  ", "   B   ", "       ")
+                .aisle("       ", "   B   ", "  B#B  ", " B#C#B ", "  B#B  ", "   B   ", "       ")
+                .aisle("       ", "       ", "   E   ", "  E~E  ", "   E   ", "       ", "       ")
+                .where("~", Predicates.controller(Predicates.blocks(definition.get())))
+                .where("D", Predicates.blocks("kubejs:hastelloy_n_75_gearbox"))
+                .where("B", Predicates.blocks("kubejs:flotation_cell"))
+                .where("A", Predicates.blocks("kubejs:hastelloy_n_75_casing")
+                    .or(Predicates.abilities(PartAbility.INPUT_ENERGY).setMaxGlobalLimited(2))
+                    .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS).setMaxGlobalLimited(1))
+                    .or(Predicates.abilities(PartAbility.IMPORT_ITEMS).setMaxGlobalLimited(2))
+                    .or(Predicates.abilities(PartAbility.EXPORT_FLUIDS).setMaxGlobalLimited(1))
+                    .or(Predicates.abilities(PartAbility.MAINTENANCE).setExactLimit(1)))
+                .where("C", Predicates.blocks("kubejs:hastelloy_n_75_pipe"))
+                .where("E", Predicates.blocks("kubejs:hastelloy_n_75_casing"))
+                .where(" ", Predicates.any())
+                .where("#", Predicates.air())
+                .build())
+        .workableCasingRenderer("kubejs:block/hastelloy_n_75_casing", "gtceu:block/multiblock/gcym/large_chemical_bath")
+
+    event.create("vacuum_drying_furnace", "multiblock", (holder) => new $CoilWorkableElectricMultiblockMachine(holder))
+        .rotationState(RotationState.ALL)
+        .recipeType("vacuum_drying")
+        .recipeType("dehydrator")
+        .tooltips(Component.translatable("gtceu.machine.available_recipe_map_2.tooltip",
+            Component.translatable("gtceu.vacuum_drying"), Component.translatable("gtceu.dehydrator")))
+        .recipeModifier((machine, recipe) => {
+            if (machine.self().getRecipeType() == GTRecipeTypes.DEHYDRATOR_RECIPES) {
+                return $RecipeHelper.applyOverclock(OverclockingLogic.NON_PERFECT_OVERCLOCK, GTRecipeModifiers.accurateParallel(machine, recipe, Math.min(2147483647, 2 ** (machine.getCoilType().getCoilTemperature() / 900)), false).getFirst(), machine.getOverclockVoltage())
+            } else {
+                return GTRecipeModifiers.ebfOverclock(machine, recipe)
+            }
+        })
+        .appearanceBlock(() => Block.getBlock("kubejs:red_steel_casing_top"))
+        .pattern((definition) =>
+            FactoryBlockPattern.start()
+                .aisle("AAA", "BBB", "BBB", "BBB", "AAA")
+                .aisle("AAA", "B B", "B B", "B B", "ACA")
+                .aisle("A~A", "BBB", "BBB", "BBB", "AAA")
+                .where("~", Predicates.controller(Predicates.blocks(definition.get())))
+                .where("C", Predicates.abilities(PartAbility.MUFFLER).setExactLimit(1))
+                .where("A", Predicates.blocks("kubejs:red_steel_casing")
+                    .or(Predicates.abilities(PartAbility.INPUT_ENERGY).setMaxGlobalLimited(2))
+                    .or(Predicates.abilities(PartAbility.MAINTENANCE).setExactLimit(1))
+                    .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS).setMaxGlobalLimited(2))
+                    .or(Predicates.abilities(PartAbility.IMPORT_ITEMS).setMaxGlobalLimited(2))
+                    .or(Predicates.abilities(PartAbility.EXPORT_FLUIDS).setMaxGlobalLimited(2))
+                    .or(Predicates.abilities(PartAbility.EXPORT_ITEMS).setMaxGlobalLimited(1)))
+                .where("B", Predicates.heatingCoils())
+                .where(" ", Predicates.air())
+                .build())
+        .additionalDisplay((controller, components) => {
+            if (controller.isFormed()) {
+                if (controller.self().getRecipeType() == GTRecipeTypes.DEHYDRATOR_RECIPES) {
+                    components.add(Component.translatable("gtceu.multiblock.parallel", Component.literal($FormattingUtil.formatNumbers(Math.min(2147483647, 2 ** (controller.getCoilType().getCoilTemperature() / 900)))).darkPurple()).gray())
+                }
+                components.add(Component.translatable("gtceu.multiblock.blast_furnace.max_temperature", Text.of($FormattingUtil.formatNumbers(controller.getCoilType().getCoilTemperature()) + "K").red()))
+            }
+        })
+        .workableCasingRenderer("kubejs:block/red_steel_casing_top", "gtceu:block/multiblock/fusion_reactor")
 })

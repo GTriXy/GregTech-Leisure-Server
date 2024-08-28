@@ -95,6 +95,7 @@ ServerEvents.recipes((event) => {
     gtr.space_elevator("1")
         .circuit(1)
         .duration(400)
+        .CWUt(16)
         .EUt(GTValues.VA[GTValues.UV])
 
     gtr.door_of_create("1")
@@ -249,7 +250,7 @@ ItemEvents.rightClicked("kubejs:time_twister_wireless", event => {
         if (recipeLogic != null && recipeLogic.isWorking()) {
             let reducedDuration = (recipeLogic.getDuration() - recipeLogic.getProgress()) * 0.5
             let eu = 8 * reducedDuration * $RecipeHelper.getInputEUt(recipeLogic.getLastRecipe())
-            if (eu > 0 && $WirelessEnergyManager.addEUToGlobalEnergyMap(event.player.uuid, $BigInteger.valueOf(- eu))) {
+            if (eu > 0 && $WirelessEnergyManager.addEUToGlobalEnergyMap(event.player.uuid, $BigInteger.valueOf(- eu), recipeLogic.getMachine())) {
                 recipeLogic.setProgress(recipeLogic.getProgress() + reducedDuration)
                 event.player.setStatusMessage("消耗了 " + $FormattingUtil.formatNumbers(eu) + " EU，使机器运行时间减少了 " + reducedDuration + " tick")
             }

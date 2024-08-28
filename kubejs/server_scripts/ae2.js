@@ -311,7 +311,7 @@ ServerEvents.recipes((event) => {
 
     gtr.assembly_line("kubejs:infinite_cell_component")
         .itemInputs("16x gtceu:256g_storage", "gtceu:data_bank", "16x gtceu:data_module", "64x ae2:creative_energy_cell", "64x #gtceu:circuits/uev", "64x gtceu:ruthenium_trinium_americium_neutronate_hex_wire", "4x gtceu:double_neutronium_plate")
-        .inputFluids("gtceu:mutated_living_solder 20000", "gtceu:pcb_coolant 100000")
+        .inputFluids("gtceu:mutated_living_solder 20000","gtceu:tairitsu 20000", "gtceu:pcb_coolant 100000")
         .itemOutputs("kubejs:infinite_cell_component")
         .EUt(GTValues.VA[GTValues.UHV])
         .duration(2400)
